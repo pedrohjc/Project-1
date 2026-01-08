@@ -14,6 +14,16 @@ export default function Home() {
       background: 'var(--balance-bg)',
       position: 'relative'
     }}>
+      {/* Logo no canto superior esquerdo */}
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        left: '20px',
+        zIndex: 10
+      }}>
+        <Logo size="medium" />
+      </div>
+
       {/* Background sutil com a paleta */}
       <div style={{
         position: 'absolute',
@@ -22,40 +32,31 @@ export default function Home() {
         right: 0,
         bottom: 0,
         background: `linear-gradient(135deg, 
-          var(--balance-branco-nevoeiro) 0%, 
+          var(--balance-bg-light) 0%, 
           #ffffff 50%, 
-          var(--balance-branco-nevoeiro) 100%)`,
+          var(--balance-bg-light) 100%)`,
         opacity: 0.5,
         zIndex: 0
       }} />
       
       <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
         <div style={{ marginBottom: '3rem' }}>
-          {/* Logo */}
-          <div style={{ 
-            marginBottom: '2rem', 
-            display: 'flex', 
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <Logo variant="isotipo" size="large" />
-          </div>
           
           <h1 style={{ 
             fontSize: '3rem', 
             marginBottom: '1rem', 
             fontWeight: '700',
-            color: 'var(--balance-azul-gravidade)',
+            color: 'var(--balance-text)',
             fontFamily: 'var(--font-brand)',
             letterSpacing: '-0.02em'
           }}>
-            Balance Solutions
+            Balance Studios
           </h1>
           
           <p style={{ 
             fontSize: '1.5rem', 
             marginBottom: '0.75rem', 
-            color: 'var(--balance-azul-gravidade)', 
+            color: 'var(--balance-text)', 
             fontWeight: '600',
             letterSpacing: '-0.01em'
           }}>
@@ -65,7 +66,7 @@ export default function Home() {
           <p style={{ 
             fontSize: '1.1rem', 
             marginBottom: '3rem', 
-            color: 'var(--balance-cinza-horizonte)', 
+            color: 'var(--balance-text-light)', 
             maxWidth: '600px', 
             margin: '0 auto 3rem',
             lineHeight: '1.7'

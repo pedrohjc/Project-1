@@ -676,7 +676,7 @@ export default function DashboardPage() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--balance-bg)' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
-            <Logo variant="isotipo" size="medium" />
+            <Logo size="medium" />
           </div>
           <p style={{ color: 'var(--balance-text-light)', fontSize: '1rem' }}>Carregando...</p>
         </div>
@@ -704,7 +704,7 @@ export default function DashboardPage() {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--balance-azul-gravidade)',
+                color: 'var(--balance-primary)',
                 cursor: 'pointer',
                 fontSize: '1.2rem',
                 padding: '4px 8px',
@@ -712,16 +712,16 @@ export default function DashboardPage() {
                 alignItems: 'center',
                 transition: 'color 0.2s ease'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--balance-azul-fluxo)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--balance-azul-gravidade)'}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--balance-primary)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--balance-primary)'}
             >
               ←
             </button>
           )}
-          <Logo variant="isotipo" size="medium" />
+          <Logo size="medium" />
           {selectedProduct && (
             <span style={{ 
-              color: 'var(--balance-cinza-horizonte)', 
+              color: 'var(--balance-text-light)', 
               fontSize: '0.9rem',
               fontWeight: '500'
             }}>
@@ -731,7 +731,7 @@ export default function DashboardPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span style={{ 
-            color: 'var(--balance-cinza-horizonte)', 
+            color: 'var(--balance-text-light)', 
             fontSize: '0.9rem',
             fontWeight: '500'
           }}>
@@ -759,14 +759,14 @@ export default function DashboardPage() {
               <h2 style={{ 
                 fontSize: '2rem', 
                 marginBottom: '0.5rem', 
-                color: 'var(--balance-azul-gravidade)',
+                color: 'var(--balance-primary)',
                 fontWeight: '700',
                 letterSpacing: '-0.01em'
               }}>
                 Nossos Produtos
               </h2>
               <p style={{ 
-                color: 'var(--balance-cinza-horizonte)', 
+                color: 'var(--balance-text-light)', 
                 fontSize: '1.1rem',
                 fontWeight: '400'
               }}>
@@ -793,7 +793,7 @@ export default function DashboardPage() {
                     padding: '32px',
                   }}
                     onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--balance-azul-fluxo)'
+                    e.currentTarget.style.borderColor = 'var(--balance-primary)'
                     e.currentTarget.style.transform = 'translateY(-4px)'
                     e.currentTarget.style.boxShadow = '0 8px 24px rgba(127, 179, 213, 0.2)'
                   }}
@@ -809,7 +809,7 @@ export default function DashboardPage() {
                   <h3 style={{ 
                     fontSize: '1.5rem', 
                     marginBottom: '0.5rem', 
-                    color: 'var(--balance-azul-gravidade)', 
+                    color: 'var(--balance-primary)', 
                     fontWeight: '600', 
                     textAlign: 'center',
                     letterSpacing: '-0.01em'
@@ -819,14 +819,14 @@ export default function DashboardPage() {
                   <p style={{ 
                     fontSize: '1rem', 
                     marginBottom: '0.75rem', 
-                    color: 'var(--balance-azul-fluxo)', 
+                    color: 'var(--balance-primary)', 
                     fontWeight: '500', 
                     textAlign: 'center'
                   }}>
                     {product.subtitle}
                   </p>
                   <p style={{ 
-                    color: 'var(--balance-cinza-horizonte)', 
+                    color: 'var(--balance-text-light)', 
                     fontSize: '0.95rem', 
                     lineHeight: '1.6', 
                     textAlign: 'center'
@@ -840,7 +840,7 @@ export default function DashboardPage() {
                     textAlign: 'center' 
                   }}>
                     <span style={{ 
-                      color: 'var(--balance-azul-fluxo)', 
+                      color: 'var(--balance-primary)', 
                       fontWeight: '600', 
                       fontSize: '0.9rem'
                     }}>
@@ -869,8 +869,8 @@ export default function DashboardPage() {
               onClick={handleNewConversation}
               style={{
                 padding: '8px 16px',
-                background: !activeConversationId ? 'var(--balance-azul-gravidade)' : 'var(--balance-branco-nevoeiro)',
-                color: !activeConversationId ? 'white' : 'var(--balance-azul-gravidade)',
+                background: !activeConversationId ? 'var(--balance-primary)' : 'var(--balance-bg-light)',
+                color: !activeConversationId ? 'white' : 'var(--balance-primary)',
                 border: '1px solid var(--balance-border)',
                 borderRadius: '8px',
                 cursor: 'pointer',
@@ -892,8 +892,8 @@ export default function DashboardPage() {
                 onClick={() => handleSelectConversation(conv.id)}
                 style={{
                   padding: '8px 12px',
-                  background: activeConversationId === conv.id ? 'var(--balance-azul-gravidade)' : 'var(--balance-branco-nevoeiro)',
-                  color: activeConversationId === conv.id ? 'white' : 'var(--balance-azul-gravidade)',
+                  background: activeConversationId === conv.id ? 'var(--balance-primary)' : 'var(--balance-bg-light)',
+                  color: activeConversationId === conv.id ? 'white' : 'var(--balance-primary)',
                   border: '1px solid var(--balance-border)',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -941,7 +941,7 @@ export default function DashboardPage() {
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                           <div style={{
                             maxWidth: '80%',
-                            background: 'var(--balance-azul-gravidade)',
+                            background: 'var(--balance-primary)',
                             color: 'white',
                             padding: '16px 20px',
                             borderRadius: '16px 16px 4px 16px',
@@ -968,7 +968,7 @@ export default function DashboardPage() {
                           }}>
                             <div style={{ 
                               fontSize: '0.75rem', 
-                              color: 'var(--balance-azul-fluxo)', 
+                              color: 'var(--balance-primary)', 
                               fontWeight: '600', 
                               marginBottom: '12px',
                               textTransform: 'uppercase',
@@ -996,23 +996,23 @@ export default function DashboardPage() {
                                     <blockquote style={{
                                       margin: '12px 0',
                                       padding: '12px 16px',
-                                      borderLeft: '4px solid var(--balance-azul-fluxo)',
-                                      background: 'var(--balance-branco-nevoeiro)',
+                                      borderLeft: '4px solid var(--balance-primary)',
+                                      background: 'var(--balance-bg-light)',
                                       borderRadius: '4px',
                                       fontStyle: 'italic',
-                                      color: 'var(--balance-cinza-estrutura)'
+                                      color: 'var(--balance-text)'
                                     }} {...props} />
                                   ),
                                   code: ({node, inline, className, children, ...props}: any) => {
                                     const match = /language-(\w+)/.exec(className || '')
                                     return inline ? (
                                       <code style={{
-                                        background: 'var(--balance-branco-nevoeiro)',
+                                        background: 'var(--balance-bg-light)',
                                         padding: '2px 6px',
                                         borderRadius: '4px',
                                         fontSize: '0.9em',
                                         fontFamily: 'var(--font-mono)',
-                                        color: 'var(--balance-azul-gravidade)',
+                                        color: 'var(--balance-primary)',
                                         fontWeight: '500'
                                       }} {...props}>
                                         {children}
@@ -1020,7 +1020,7 @@ export default function DashboardPage() {
                                     ) : (
                                       <code className={className} style={{
                                         display: 'block',
-                                        background: 'var(--balance-branco-nevoeiro)',
+                                        background: 'var(--balance-bg-light)',
                                         padding: '12px 16px',
                                         borderRadius: '8px',
                                         fontSize: '0.9em',
@@ -1030,7 +1030,7 @@ export default function DashboardPage() {
                                         lineHeight: '1.6',
                                         whiteSpace: 'pre-wrap',
                                         wordBreak: 'break-word',
-                                        color: 'var(--balance-azul-gravidade)'
+                                        color: 'var(--balance-primary)'
                                       }} {...props}>
                                         {children}
                                       </code>
@@ -1046,9 +1046,9 @@ export default function DashboardPage() {
                                   a: ({node, ...props}) => (
                                     <a
                                       style={{
-                                        color: 'var(--balance-azul-fluxo)',
+                                        color: 'var(--balance-primary)',
                                         textDecoration: 'none',
-                                        borderBottom: '1px solid var(--balance-azul-fluxo)'
+                                        borderBottom: '1px solid var(--balance-primary)'
                                       }}
                                       target="_blank"
                                       rel="noopener noreferrer"
@@ -1074,11 +1074,11 @@ export default function DashboardPage() {
                                   th: ({node, ...props}) => (
                                     <th style={{
                                       padding: '8px 12px',
-                                      background: 'var(--balance-branco-nevoeiro)',
+                                      background: 'var(--balance-bg-light)',
                                       border: '1px solid var(--balance-border)',
                                       textAlign: 'left',
                                       fontWeight: '600',
-                                      color: 'var(--balance-azul-gravidade)'
+                                      color: 'var(--balance-primary)'
                                     }} {...props} />
                                   ),
                                   td: ({node, ...props}) => (
@@ -1142,7 +1142,7 @@ export default function DashboardPage() {
                           width: '8px',
                           height: '8px',
                           borderRadius: '50%',
-                          background: 'var(--balance-azul-fluxo)',
+                          background: 'var(--balance-primary)',
                           animation: 'pulse 1.5s ease-in-out infinite'
                         }}></span>
                         <span style={{
@@ -1150,7 +1150,7 @@ export default function DashboardPage() {
                           width: '8px',
                           height: '8px',
                           borderRadius: '50%',
-                          background: 'var(--balance-azul-fluxo)',
+                          background: 'var(--balance-primary)',
                           animation: 'pulse 1.5s ease-in-out infinite 0.2s'
                         }}></span>
                         <span style={{
@@ -1158,12 +1158,12 @@ export default function DashboardPage() {
                           width: '8px',
                           height: '8px',
                           borderRadius: '50%',
-                          background: 'var(--balance-azul-fluxo)',
+                          background: 'var(--balance-primary)',
                           animation: 'pulse 1.5s ease-in-out infinite 0.4s'
                         }}></span>
                         <span style={{ 
                           marginLeft: '8px', 
-                          color: 'var(--balance-cinza-horizonte)', 
+                          color: 'var(--balance-text-light)', 
                           fontSize: '0.9rem' 
                         }}>
                           {getProcessingText()}
@@ -1196,7 +1196,7 @@ export default function DashboardPage() {
                     }}>
                       <span style={{ 
                         fontSize: '0.85rem', 
-                        color: 'var(--balance-cinza-horizonte)', 
+                        color: 'var(--balance-text-light)', 
                         fontWeight: '500' 
                       }}>
                         {selectedFiles.length} arquivo(s) selecionado(s)
@@ -1207,15 +1207,15 @@ export default function DashboardPage() {
                           style={{
                             background: 'none',
                             border: 'none',
-                            color: 'var(--balance-azul-fluxo)',
+                            color: 'var(--balance-primary)',
                             cursor: 'pointer',
                             fontSize: '0.85rem',
                             padding: '4px 8px',
                             fontWeight: '600',
                             transition: 'color 0.2s ease'
                           }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--balance-azul-gravidade)'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--balance-azul-fluxo)'}
+                          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--balance-primary)'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--balance-primary)'}
                         >
                           Remover todos
                         </button>
@@ -1233,7 +1233,7 @@ export default function DashboardPage() {
                           key={index}
                           style={{
                             padding: '12px 16px',
-                            background: 'var(--balance-branco-nevoeiro)',
+                            background: 'var(--balance-bg-light)',
                             borderRadius: '8px',
                             display: 'flex',
                             alignItems: 'center',
@@ -1245,13 +1245,13 @@ export default function DashboardPage() {
                             flex: 1, 
                             fontSize: '0.9rem', 
                             wordBreak: 'break-word',
-                            color: 'var(--balance-cinza-estrutura)'
+                            color: 'var(--balance-text)'
                           }}>
                             {file.name}
                           </span>
                           <span style={{ 
                             fontSize: '0.85rem', 
-                            color: 'var(--balance-cinza-horizonte)', 
+                            color: 'var(--balance-text-light)', 
                             whiteSpace: 'nowrap' 
                           }}>
                             {(file.size / 1024).toFixed(1)} KB
@@ -1261,7 +1261,7 @@ export default function DashboardPage() {
                             style={{
                               background: 'none',
                               border: 'none',
-                              color: 'var(--balance-cinza-horizonte)',
+                              color: 'var(--balance-text-light)',
                               cursor: 'pointer',
                               fontSize: '1.2rem',
                               padding: '0 4px'
@@ -1290,7 +1290,7 @@ export default function DashboardPage() {
                     htmlFor="file-input"
                     style={{
                       padding: '12px',
-                      background: 'var(--balance-branco-nevoeiro)',
+                      background: 'var(--balance-bg-light)',
                       border: '1px solid var(--balance-border)',
                       borderRadius: '12px',
                       cursor: fileProcessing || processing ? 'not-allowed' : 'pointer',
@@ -1303,14 +1303,14 @@ export default function DashboardPage() {
                     }}
                     onMouseEnter={(e) => {
                       if (!fileProcessing && !processing) {
-                        e.currentTarget.style.borderColor = 'var(--balance-azul-fluxo)'
-                        e.currentTarget.style.background = 'var(--balance-azul-fluxo)'
+                        e.currentTarget.style.borderColor = 'var(--balance-primary)'
+                        e.currentTarget.style.background = 'var(--balance-primary)'
                         e.currentTarget.style.opacity = '0.9'
                       }
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = 'var(--balance-border)'
-                      e.currentTarget.style.background = 'var(--balance-branco-nevoeiro)'
+                      e.currentTarget.style.background = 'var(--balance-bg-light)'
                       e.currentTarget.style.opacity = fileProcessing || processing ? 0.5 : 1
                     }}
                   >
@@ -1333,7 +1333,7 @@ export default function DashboardPage() {
                         borderRadius: '12px',
                         fontSize: '16px',
                         fontFamily: 'inherit',
-                        background: 'var(--balance-branco-nevoeiro)',
+                        background: 'var(--balance-bg-light)',
                         resize: 'none',
                         minHeight: '48px',
                         maxHeight: isExpanded ? '400px' : '200px',
@@ -1341,7 +1341,7 @@ export default function DashboardPage() {
                         lineHeight: '1.5',
                         overflowY: 'auto',
                         transition: 'height 0.2s ease',
-                        color: 'var(--balance-cinza-estrutura)'
+                        color: 'var(--balance-text)'
                       }}
                       rows={1}
                     />
@@ -1354,7 +1354,7 @@ export default function DashboardPage() {
                           position: 'absolute',
                           right: '8px',
                           bottom: '8px',
-                          background: 'var(--balance-branco-nevoeiro)',
+                          background: 'var(--balance-bg-light)',
                           border: '1px solid var(--balance-border)',
                           borderRadius: '6px',
                           width: '28px',
@@ -1363,19 +1363,19 @@ export default function DashboardPage() {
                           alignItems: 'center',
                           justifyContent: 'center',
                           cursor: 'pointer',
-                          color: 'var(--balance-cinza-horizonte)',
+                          color: 'var(--balance-text-light)',
                           fontSize: '0.9rem',
                           padding: 0,
                           transition: 'all 0.2s ease'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'var(--balance-azul-gravidade)'
+                          e.currentTarget.style.background = 'var(--balance-primary)'
                           e.currentTarget.style.color = 'white'
-                          e.currentTarget.style.borderColor = 'var(--balance-azul-gravidade)'
+                          e.currentTarget.style.borderColor = 'var(--balance-primary)'
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'var(--balance-branco-nevoeiro)'
-                          e.currentTarget.style.color = 'var(--balance-cinza-horizonte)'
+                          e.currentTarget.style.background = 'var(--balance-bg-light)'
+                          e.currentTarget.style.color = 'var(--balance-text-light)'
                           e.currentTarget.style.borderColor = 'var(--balance-border)'
                         }}
                         title={isExpanded ? 'Reduzir' : 'Expandir'}
@@ -1391,8 +1391,8 @@ export default function DashboardPage() {
                     style={{
                       padding: '12px 24px',
                       background: (!input.trim() && selectedFiles.length === 0) || processing 
-                        ? 'var(--balance-cinza-horizonte)' 
-                        : 'var(--balance-azul-gravidade)',
+                        ? '#ccc' 
+                        : 'var(--balance-primary)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '12px',
@@ -1426,7 +1426,7 @@ export default function DashboardPage() {
                 
                 <div style={{ 
                   fontSize: '0.75rem', 
-                  color: 'var(--balance-cinza-horizonte)', 
+                  color: 'var(--balance-text-light)', 
                   marginTop: '8px', 
                   textAlign: 'center'
                 }}>

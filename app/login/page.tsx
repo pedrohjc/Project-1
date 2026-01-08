@@ -52,22 +52,22 @@ export default function LoginPage() {
       <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
-            <Logo variant="isotipo" size="medium" />
+            <Logo size="medium" />
           </div>
           <h1 style={{ 
             fontSize: '2rem', 
             marginBottom: '0.5rem',
-            color: 'var(--balance-azul-gravidade)',
+            color: 'var(--balance-text)',
             fontFamily: 'var(--font-brand)',
             fontWeight: '900',
             letterSpacing: '-0.02em'
           }}>
-            Balance Solutions
+            Balance Studios
           </h1>
           <h2 style={{ 
             fontSize: '1.5rem', 
             marginBottom: '1.5rem', 
-            color: 'var(--balance-azul-gravidade)',
+            color: 'var(--balance-text)',
             fontWeight: '600'
           }}>
             Login
@@ -125,13 +125,13 @@ export default function LoginPage() {
         <p style={{ 
           marginTop: '20px', 
           textAlign: 'center', 
-          color: 'var(--balance-cinza-horizonte)' 
+          color: 'var(--balance-text-light)' 
         }}>
           Não tem uma conta?{' '}
           <Link 
             href="/register" 
             style={{ 
-              color: 'var(--balance-azul-fluxo)', 
+              color: 'var(--balance-primary)', 
               fontWeight: '600',
               textDecoration: 'none'
             }}
@@ -144,7 +144,7 @@ export default function LoginPage() {
           <Link 
             href="/" 
             style={{ 
-              color: 'var(--balance-cinza-horizonte)',
+              color: 'var(--balance-text-light)',
               textDecoration: 'none'
             }}
           >
