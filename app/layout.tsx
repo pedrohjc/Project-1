@@ -1,0 +1,30 @@
+import type { Metadata } from 'next'
+import { Sora } from 'next/font/google'
+import './globals.css'
+
+const sora = Sora({ 
+  subsets: ['latin'],
+  variable: '--font-sora',
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+})
+
+export const metadata: Metadata = {
+  title: 'Balance Solutions',
+  description: 'Automação que libera seu time. Conectamos inteligência, automação e pessoas para te entregar tempo.',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="pt-BR">
+      <body className={sora.variable} style={{ fontFamily: 'var(--font-sora)' }}>
+        {children}
+      </body>
+    </html>
+  )
+}
+

@@ -1,0 +1,172 @@
+/* Importar fontes */
+@import url('https://fonts.googleapis.com/css2?family=Sono:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--balance-cinza-estrutura);
+  background: #ffffff;
+  font-family: var(--font-sora, 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  /* Paleta de Cores Balance Solutions */
+  --balance-azul-gravidade: #1c2b3a;
+  --balance-cinza-horizonte: #506770;
+  --balance-azul-fluxo: #7fb3d5;
+  --balance-verde-autonomia: #32c8a7;
+  --balance-cinza-estrutura: #333333;
+  --balance-branco-nevoeiro: #dbdbd5;
+
+  /* Cores funcionais (baseadas na paleta) */
+  --balance-primary: var(--balance-azul-gravidade);
+  --balance-primary-dark: #151e26;
+  --balance-secondary: var(--balance-cinza-horizonte);
+  --balance-accent: var(--balance-azul-fluxo);
+  --balance-success: var(--balance-verde-autonomia);
+  --balance-text: var(--balance-cinza-estrutura);
+  --balance-text-light: var(--balance-cinza-horizonte);
+  --balance-bg: #ffffff;
+  --balance-bg-light: var(--balance-branco-nevoeiro);
+  --balance-border: #e0e0e0;
+  --balance-shadow: rgba(28, 43, 58, 0.08);
+  
+  /* Tipografia */
+  --font-brand: 'Eurostile', 'Arial Black', 'Arial Bold', sans-serif;
+  --font-body: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-mono: 'Sono', 'Courier New', Courier, monospace;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: -0.01em;
+}
+
+.btn-primary {
+  background: var(--balance-azul-gravidade);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: var(--balance-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(28, 43, 58, 0.25);
+}
+
+.btn-primary:disabled {
+  background: var(--balance-cinza-horizonte);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.btn-secondary {
+  background: var(--balance-cinza-horizonte);
+  color: white;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background: #3d5159;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(80, 103, 112, 0.2);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--balance-azul-fluxo);
+  box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.15);
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--balance-border);
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.card {
+  background: var(--balance-bg);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px var(--balance-shadow);
+  border: 1px solid var(--balance-border);
+}
+
+.balance-gradient {
+  background: linear-gradient(135deg, var(--balance-azul-gravidade) 0%, var(--balance-azul-fluxo) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: var(--font-brand);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+/* Estilos de tipografia */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--balance-cinza-estrutura);
+  letter-spacing: -0.01em;
+}
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
