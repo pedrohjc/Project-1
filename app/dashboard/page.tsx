@@ -51,6 +51,18 @@ export default function DashboardPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [textareaHeight, setTextareaHeight] = useState(48) // altura mínima
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [profileError, setProfileError] = useState('')
+  const [profileSuccess, setProfileSuccess] = useState('')
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
 
   useEffect(() => {
     checkAuth()
@@ -70,6 +82,21 @@ export default function DashboardPage() {
     scrollToBottom()
   }, [conversations, activeConversationId])
 
+  // Fechar menu ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (showUserMenu && !target.closest('[data-user-menu]')) {
+        setShowUserMenu(false)
+      }
+    }
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showUserMenu])
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -83,10 +110,136 @@ export default function DashboardPage() {
       }
       const data = await response.json()
       setUser(data.user)
+      // Preencher formulário de perfil com dados do usuário
+      setProfileForm({
+        name: data.user.name || '',
+        email: data.user.email || '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
     } catch (err) {
       router.push('/login')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleOpenProfile = async () => {
+    setShowProfileModal(true)
+    setProfileError('')
+    setProfileSuccess('')
+    setShowUserMenu(false)
+    
+    // Buscar dados atualizados do perfil
+    try {
+      const response = await fetch('/api/auth/profile')
+      if (response.ok) {
+        const data = await response.json()
+        setProfileForm({
+          name: data.user.name || '',
+          email: data.user.email || '',
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        })
+      }
+    } catch (err) {
+      console.error('Erro ao carregar perfil:', err)
+    }
+  }
+
+  const handleCloseProfile = () => {
+    setShowProfileModal(false)
+    setProfileError('')
+    setProfileSuccess('')
+    setProfileForm({
+      name: user?.name || '',
+      email: user?.email || '',
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    })
+  }
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setProfileError('')
+    setProfileSuccess('')
+    setProfileLoading(true)
+
+    try {
+      // Validar senha se fornecida
+      if (profileForm.newPassword && profileForm.newPassword !== profileForm.confirmPassword) {
+        setProfileError('As senhas não coincidem')
+        setProfileLoading(false)
+        return
+      }
+
+      if (profileForm.newPassword && profileForm.newPassword.length < 6) {
+        setProfileError('A nova senha deve ter pelo menos 6 caracteres')
+        setProfileLoading(false)
+        return
+      }
+
+      // Preparar dados para envio
+      const updateData: any = {}
+      
+      if (profileForm.name.trim() !== user?.name) {
+        updateData.name = profileForm.name.trim()
+      }
+      
+      if (profileForm.email.trim() !== user?.email) {
+        updateData.email = profileForm.email.trim()
+      }
+
+      if (profileForm.newPassword) {
+        updateData.currentPassword = profileForm.currentPassword
+        updateData.newPassword = profileForm.newPassword
+      }
+
+      // Se não houver nada para atualizar
+      if (Object.keys(updateData).length === 0) {
+        setProfileError('Nenhuma alteração detectada')
+        setProfileLoading(false)
+        return
+      }
+
+      const response = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setProfileError(data.error || 'Erro ao atualizar perfil')
+        setProfileLoading(false)
+        return
+      }
+
+      // Atualizar estado do usuário
+      setUser(data.user)
+      setProfileSuccess('Perfil atualizado com sucesso!')
+      
+      // Limpar campos de senha
+      setProfileForm(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }))
+
+      // Fechar modal após 2 segundos
+      setTimeout(() => {
+        handleCloseProfile()
+      }, 2000)
+    } catch (err) {
+      setProfileError('Erro ao atualizar perfil. Tente novamente.')
+      console.error('Erro ao atualizar perfil:', err)
+    } finally {
+      setProfileLoading(false)
     }
   }
 
@@ -729,25 +882,110 @@ export default function DashboardPage() {
             </span>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ 
-            color: 'var(--balance-text-light)', 
-            fontSize: '0.9rem',
-            fontWeight: '500'
-          }}>
-            {user?.name}
-          </span>
-          <button 
-            onClick={handleLogout} 
-            className="btn btn-secondary" 
-            style={{ 
-              padding: '8px 16px', 
-              fontSize: '0.9rem',
-              fontWeight: '600'
-            }}
-          >
-            Sair
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', position: 'relative' }}>
+          {/* Menu de usuário */}
+          <div style={{ position: 'relative' }} data-user-menu>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                transition: 'background 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+            >
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'var(--balance-primary)',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.9rem',
+                fontWeight: '600'
+              }}>
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <span style={{ 
+                color: 'var(--balance-text)', 
+                fontSize: '0.9rem',
+                fontWeight: '500'
+              }}>
+                {user?.name}
+              </span>
+              <span style={{ color: 'var(--balance-text-light)', fontSize: '0.8rem' }}>
+                ▼
+              </span>
+            </button>
+
+            {/* Dropdown menu */}
+            {showUserMenu && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '8px',
+                background: 'white',
+                border: '1px solid var(--balance-border)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                minWidth: '200px',
+                zIndex: 1000,
+                overflow: 'hidden'
+              }}>
+                <button
+                  onClick={handleOpenProfile}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    color: 'var(--balance-text)',
+                    transition: 'background 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  👤 Meu Perfil
+                </button>
+                <div style={{
+                  height: '1px',
+                  background: 'var(--balance-border)',
+                  margin: '4px 0'
+                }} />
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    color: 'var(--balance-text)',
+                    transition: 'background 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  🚪 Sair
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -1434,6 +1672,197 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Perfil */}
+      {showProfileModal && (
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCloseProfile()
+            }
+          }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: '20px'
+          }}
+        >
+          <div className="card" style={{
+            width: '100%',
+            maxWidth: '500px',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '24px'
+            }}>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '600',
+                color: 'var(--balance-text)',
+                margin: 0
+              }}>
+                Meu Perfil
+              </h2>
+              <button
+                onClick={handleCloseProfile}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  color: 'var(--balance-text-light)',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--balance-bg-light)'
+                  e.currentTarget.style.color = 'var(--balance-text)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'none'
+                  e.currentTarget.style.color = 'var(--balance-text-light)'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {profileError && (
+              <div style={{
+                padding: '12px',
+                background: '#fee',
+                color: '#c33',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                fontSize: '0.9rem'
+              }}>
+                {profileError}
+              </div>
+            )}
+
+            {profileSuccess && (
+              <div style={{
+                padding: '12px',
+                background: '#efe',
+                color: '#3c3',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                fontSize: '0.9rem'
+              }}>
+                {profileSuccess}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateProfile}>
+              <div className="form-group">
+                <label htmlFor="profile-name">Nome</label>
+                <input
+                  type="text"
+                  id="profile-name"
+                  value={profileForm.name}
+                  onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Seu nome"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="profile-email">Email</label>
+                <input
+                  type="email"
+                  id="profile-email"
+                  value={profileForm.email}
+                  onChange={(e) => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="seu@email.com"
+                  required
+                />
+              </div>
+
+              <div style={{
+                marginTop: '32px',
+                marginBottom: '24px',
+                borderTop: '1px solid var(--balance-border)',
+                paddingTop: '24px'
+              }}>
+                <h3 style={{
+                  fontSize: '1.1rem',
+                  fontWeight: '600',
+                  color: 'var(--balance-text)',
+                  marginBottom: '16px'
+                }}>
+                  Alterar Senha (opcional)
+                </h3>
+
+                <div className="form-group">
+                  <label htmlFor="current-password">Senha Atual</label>
+                  <input
+                    type="password"
+                    id="current-password"
+                    value={profileForm.currentPassword}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                    placeholder="Digite sua senha atual"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="new-password">Nova Senha</label>
+                  <input
+                    type="password"
+                    id="new-password"
+                    value={profileForm.newPassword}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                    placeholder="Mínimo 6 caracteres"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="confirm-password">Confirmar Nova Senha</label>
+                  <input
+                    type="password"
+                    id="confirm-password"
+                    value={profileForm.confirmPassword}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    placeholder="Digite a nova senha novamente"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={handleCloseProfile}
+                  className="btn btn-secondary"
+                  style={{ padding: '12px 24px' }}
+                  disabled={profileLoading}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ padding: '12px 24px' }}
+                  disabled={profileLoading}
+                >
+                  {profileLoading ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
