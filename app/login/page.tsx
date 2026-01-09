@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '../../components/Logo'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -51,9 +50,6 @@ export default function LoginPage() {
     }}>
       <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
-            <Logo size="medium" />
-          </div>
           <h1 style={{ 
             fontSize: '2rem', 
             marginBottom: '0.5rem',

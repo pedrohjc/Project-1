@@ -931,6 +931,18 @@ async function handleGemini(
   }
 
   if (!conversation) {
+    // Verificar se o usuário já tem 5 conversas para este produto
+    const existingConversationsCount = await prisma.conversation.count({
+      where: {
+        userId,
+        productId,
+      },
+    })
+
+    if (existingConversationsCount >= 5) {
+      throw new Error('Você já possui o máximo de 5 conversas para este produto. Por favor, exclua uma conversa antes de criar uma nova.')
+    }
+
     conversation = await prisma.conversation.create({
       data: {
         productId,

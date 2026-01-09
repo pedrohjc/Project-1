@@ -158,3 +158,21 @@ code, pre {
   font-size: 0.9em;
 }
 
+/* Estilos para carrossel horizontal */
+::-webkit-scrollbar {
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--balance-bg-light);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--balance-primary);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--balance-primary-dark);
+}

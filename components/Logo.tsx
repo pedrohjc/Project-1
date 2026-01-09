@@ -1,33 +1,34 @@
 import React from 'react'
+import Image from 'next/image'
 
 interface LogoProps {
   size?: 'small' | 'medium' | 'large'
 }
 
-// Componente simples do logo - apenas texto "Balance Studios"
+// Componente do logo Balance usando imagem PNG
 export const Logo: React.FC<LogoProps> = ({ 
   size = 'medium'
 }) => {
   const sizeMap = {
-    small: { fontSize: '1rem' },
-    medium: { fontSize: '1.5rem' },
-    large: { fontSize: '2.5rem' }
+    small: { width: 120, height: 40 },
+    medium: { width: 180, height: 60 },
+    large: { width: 240, height: 80 }
   }
 
   const currentSize = sizeMap[size]
 
   return (
-    <span 
-      style={{ 
-        fontFamily: '"Eurostile", "Arial Black", "Arial Bold", sans-serif',
-        fontSize: currentSize.fontSize,
-        fontWeight: 900,
-        color: '#333333',
-        letterSpacing: '-0.02em'
+    <Image
+      src="/balance-logo.png"
+      alt="Balance"
+      width={currentSize.width}
+      height={currentSize.height}
+      style={{
+        objectFit: 'contain',
+        height: 'auto'
       }}
-    >
-      Balance Studios
-    </span>
+      priority
+    />
   )
 }
 
