@@ -64,6 +64,7 @@ export default function DashboardPage() {
     confirmPassword: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
+  const [recentProducts, setRecentProducts] = useState<Product[]>([])
 
   useEffect(() => {
     checkAuth()
@@ -258,6 +259,7 @@ export default function DashboardPage() {
     }
   }
 
+
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' })
     router.push('/')
@@ -270,6 +272,8 @@ export default function DashboardPage() {
     setSelectedFiles([])
     // Carregar conversas do produto selecionado
     await loadConversations()
+    // Atualizar lista de produtos recentes
+    await loadRecentProducts()
   }
 
   const handleBackToProducts = () => {
@@ -746,6 +750,48 @@ export default function DashboardPage() {
       icon: <OrganizadorPropostasIcon />
     }
   ]
+
+  // Função para carregar produtos recentes
+  const loadRecentProducts = async () => {
+    try {
+      // Buscar todas as conversas para identificar produtos usados
+      const response = await fetch('/api/conversations')
+      if (response.ok) {
+        const data = await response.json()
+        const allConversations = data.conversations || []
+        
+        // Extrair productIds únicos ordenados por data de uso mais recente
+        const productUsageMap = new Map<string, string>()
+        allConversations.forEach((conv: Conversation) => {
+          if (!productUsageMap.has(conv.productId) || 
+              new Date(conv.updatedAt) > new Date(productUsageMap.get(conv.productId)!)) {
+            productUsageMap.set(conv.productId, conv.updatedAt)
+          }
+        })
+        
+        // Ordenar por data mais recente
+        const sortedProductIds = Array.from(productUsageMap.entries())
+          .sort((a, b) => new Date(b[1]).getTime() - new Date(a[1]).getTime())
+          .map(([productId]) => productId)
+          .slice(0, 5) // Limitar a 5 produtos mais recentes
+        
+        // Mapear para objetos Product (products está definido abaixo)
+        const recentProductsList = sortedProductIds
+          .map(id => products.find(p => p.id === id))
+          .filter((p): p is Product => p !== undefined)
+        
+        setRecentProducts(recentProductsList)
+      }
+    } catch (err) {
+      console.error('Erro ao carregar produtos recentes:', err)
+    }
+  }
+
+  useEffect(() => {
+    if (user && products.length > 0) {
+      loadRecentProducts()
+    }
+  }, [user, products])
 
   // Função para obter o ícone do produto baseado no ID
   const getProductIcon = (productId: string) => {
@@ -1364,11 +1410,13 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          {/* Área principal */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--balance-bg)' }}>
-            {/* Mensagens */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '24px', background: 'var(--balance-bg)' }}>
-              <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          {/* Área principal com sidebar */}
+          <div style={{ flex: 1, display: 'flex', overflow: 'hidden', background: 'var(--balance-bg)' }}>
+            {/* Conteúdo principal */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--balance-bg)' }}>
+              {/* Mensagens */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '24px', background: 'var(--balance-bg)' }}>
+                <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                 {activeConversation && activeConversation.messages.length > 0 ? (
                   activeConversation.messages.map((msg, idx) => (
                     <div key={msg.id || idx} style={{ marginBottom: '24px' }}>
@@ -1870,6 +1918,93 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+            </div>
+
+            {/* Sidebar - Produtos Recentes */}
+            {recentProducts.length > 0 && (
+              <div style={{
+                width: '280px',
+                borderLeft: '1px solid var(--balance-border)',
+                background: 'white',
+                padding: '20px',
+                overflowY: 'auto',
+                flexShrink: 0
+              }}>
+                <h3 style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  color: 'var(--balance-text)',
+                  marginBottom: '16px',
+                  paddingBottom: '12px',
+                  borderBottom: '1px solid var(--balance-border)'
+                }}>
+                  Chats Recentes
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {recentProducts
+                    .filter(p => p.id !== selectedProduct?.id) // Não mostrar o produto atual
+                    .map((product) => (
+                      <div
+                        key={product.id}
+                        onClick={() => handleProductSelect(product)}
+                        style={{
+                          padding: '12px',
+                          border: '1px solid var(--balance-border)',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          background: 'var(--balance-bg-light)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--balance-primary)'
+                          e.currentTarget.style.background = 'white'
+                          e.currentTarget.style.transform = 'translateX(4px)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--balance-border)'
+                          e.currentTarget.style.background = 'var(--balance-bg-light)'
+                          e.currentTarget.style.transform = 'translateX(0)'
+                        }}
+                      >
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '10px',
+                          marginBottom: '8px'
+                        }}>
+                          <div style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {getProductIcon(product.id)}
+                          </div>
+                          <h4 style={{
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            color: 'var(--balance-text)',
+                            margin: 0,
+                            lineHeight: '1.3'
+                          }}>
+                            {product.title}
+                          </h4>
+                        </div>
+                        <p style={{
+                          fontSize: '0.8rem',
+                          color: 'var(--balance-text-light)',
+                          margin: 0,
+                          lineHeight: '1.4'
+                        }}>
+                          {product.subtitle}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
