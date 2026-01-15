@@ -63,6 +63,7 @@ export default function DashboardPage() {
     newPassword: '',
     confirmPassword: ''
   })
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     checkAuth()
@@ -1016,7 +1017,7 @@ export default function DashboardPage() {
                 fontWeight: '700',
                 letterSpacing: '-0.01em'
               }}>
-                Nossos Produtos
+                Catálogo de Produtos
               </h2>
               <p style={{ 
                 color: 'var(--balance-text-light)', 
@@ -1027,14 +1028,140 @@ export default function DashboardPage() {
               </p>
             </div>
 
+            {/* Campo de pesquisa */}
             <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-              gap: '24px',
-              maxWidth: '800px',
-              margin: '0 auto'
+              maxWidth: '600px', 
+              margin: '0 auto 3rem',
+              position: 'relative'
             }}>
-              {products.map((product) => (
+              <div style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <input
+                  type="text"
+                  placeholder="Pesquisar produtos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '14px 48px 14px 16px',
+                    border: '2px solid var(--balance-border)',
+                    borderRadius: '12px',
+                    fontSize: '1rem',
+                    fontFamily: 'inherit',
+                    background: 'white',
+                    color: 'var(--balance-text)',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--balance-primary)'
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 102, 255, 0.1)'
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--balance-border)'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  right: '16px',
+                  color: 'var(--balance-text-light)',
+                  fontSize: '1.2rem',
+                  pointerEvents: 'none'
+                }}>
+                  🔍
+                </div>
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    style={{
+                      position: 'absolute',
+                      right: '48px',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--balance-text-light)',
+                      cursor: 'pointer',
+                      fontSize: '1.2rem',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--balance-primary)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--balance-text-light)'
+                    }}
+                    title="Limpar pesquisa"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Filtrar produtos baseado na pesquisa */}
+            {(() => {
+              const filteredProducts = products.filter(product => {
+                if (!searchTerm.trim()) return true
+                const search = searchTerm.toLowerCase()
+                return (
+                  product.title.toLowerCase().includes(search) ||
+                  product.subtitle.toLowerCase().includes(search) ||
+                  product.description.toLowerCase().includes(search)
+                )
+              })
+
+              if (filteredProducts.length === 0) {
+                return (
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: '60px 20px',
+                    color: 'var(--balance-text-light)'
+                  }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>
+                    <h3 style={{ 
+                      fontSize: '1.5rem', 
+                      marginBottom: '0.5rem',
+                      color: 'var(--balance-text)'
+                    }}>
+                      Nenhum produto encontrado
+                    </h3>
+                    <p style={{ fontSize: '1rem' }}>
+                      Tente pesquisar com outros termos ou{' '}
+                      <button
+                        onClick={() => setSearchTerm('')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--balance-primary)',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                          fontSize: '1rem',
+                          fontFamily: 'inherit'
+                        }}
+                      >
+                        limpe a pesquisa
+                      </button>
+                    </p>
+                  </div>
+                )
+              }
+
+              return (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+                  gap: '24px',
+                  maxWidth: '800px',
+                  margin: '0 auto'
+                }}>
+                  {filteredProducts.map((product) => (
                 <div
                   key={product.id}
                   onClick={() => handleProductSelect(product)}
@@ -1101,8 +1228,10 @@ export default function DashboardPage() {
                     </span>
                   </div>
                 </div>
-              ))}
-            </div>
+                  ))}
+                </div>
+              )
+            })()}
           </div>
 
           {/* Botão flutuante do WhatsApp */}
