@@ -1,0 +1,5 @@
+/* Estilos específicos para página de assinatura */
+.subscription-page {
+  min-height: 100vh;
+  background: var(--balance-bg);
+}

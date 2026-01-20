@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserIdFromRequest } from '@/lib/middleware'
+import { checkUserSubscription } from '@/lib/subscription'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI("AIzaSyCOwRqIllm41rcBjUWyMqLr2ey_76RRRbo")
@@ -843,6 +844,20 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
+
+    // TODO: REATIVAR EM PRODUÇÃO - Verificação de assinatura desabilitada para desenvolvimento
+    // Verificar se o usuário tem assinatura ativa
+    // const { hasActiveSubscription } = await checkUserSubscription(userId)
+    // if (!hasActiveSubscription) {
+    //   return NextResponse.json(
+    //     { 
+    //       error: 'Assinatura necessária',
+    //       message: 'Você precisa de uma assinatura ativa para usar os produtos. Acesse /subscription para assinar.',
+    //       requiresSubscription: true
+    //     },
+    //     { status: 403 }
+    //   )
+    // }
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(

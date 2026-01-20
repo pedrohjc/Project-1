@@ -7,7 +7,7 @@ import './globals.css'
 export default function Home() {
   return (
     <div style={{ 
-      minHeight: '100vh',
+      minHeight: '100vh', 
       background: 'var(--balance-bg)'
     }}>
       {/* Header fixo */}
@@ -24,8 +24,8 @@ export default function Home() {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center' 
-        }}>
-          <Logo size="medium" />
+      }}>
+        <Logo size="medium" />
           <div style={{ display: 'flex', gap: '1rem' }}>
             <Link 
               href="/login" 
@@ -57,7 +57,7 @@ export default function Home() {
               Criar Conta
             </Link>
           </div>
-        </div>
+      </div>
       </header>
 
       {/* Hero Section */}
@@ -73,7 +73,7 @@ export default function Home() {
           #ffffff 50%, 
           var(--balance-bg-light) 100%)`
       }}>
-        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+      <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <h1 style={{ 
             fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
             marginBottom: '1.5rem', 
@@ -107,26 +107,26 @@ export default function Home() {
             Transforme a forma como sua equipe trabalha. Nossa plataforma de IA e automação 
             elimina tarefas repetitivas e libera tempo para o que realmente importa.
           </p>
-          
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link 
+        
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link 
               href="/register" 
-              className="btn btn-primary" 
-              style={{ 
-                fontSize: '1.1rem', 
+            className="btn btn-primary" 
+            style={{ 
+              fontSize: '1.1rem', 
                 padding: '16px 40px',
-                fontWeight: '600'
-              }}
-            >
+              fontWeight: '600'
+            }}
+          >
               Começar Agora
-            </Link>
-            <Link 
+          </Link>
+          <Link 
               href="#produtos" 
-              className="btn btn-secondary" 
-              style={{ 
-                fontSize: '1.1rem', 
+            className="btn btn-secondary" 
+            style={{ 
+              fontSize: '1.1rem', 
                 padding: '16px 40px',
-                fontWeight: '600'
+              fontWeight: '600'
               }}
             >
               Conhecer Produtos
@@ -783,9 +783,9 @@ export default function Home() {
               }}
             >
               Já tenho conta
-            </Link>
-          </div>
+          </Link>
         </div>
+      </div>
       </section>
     </div>
   )

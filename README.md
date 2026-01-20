@@ -35,12 +35,16 @@ npx prisma migrate dev --name init
 DATABASE_URL="file:./dev.db"
 JWT_SECRET="seu-secret-key-aqui-mude-em-producao"
 NEXT_PUBLIC_API_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 GEMINI_API_KEY="sua-chave-gemini-aqui"
+MERCADOPAGO_ACCESS_TOKEN="seu-access-token-do-mercadopago"
 ```
 
 **Importante:** 
 - Você precisa de uma chave de API do Google Gemini. Obtenha em: https://aistudio.google.com/app/apikey
+- Você precisa de um Access Token do MercadoPago. Obtenha em: https://www.mercadopago.com.br/developers/panel/credentials
 - O produto "Balance Tradutor de Juridiquês" usa a Gem configurada via `systemInstruction` no código
+- Para produção, configure a URL do webhook do MercadoPago nas configurações da sua aplicação no MercadoPago
 
 4. Inicie o servidor de desenvolvimento:
 ```bash
@@ -54,18 +58,22 @@ npm run dev
 ```
 ├── app/
 │   ├── api/
-│   │   ├── auth/          # Rotas de autenticação
-│   │   └── ai/            # Rotas de produtos de IA
-│   ├── dashboard/         # Página do dashboard
-│   ├── login/             # Página de login
-│   ├── register/          # Página de registro
-│   └── page.tsx           # Página inicial
+│   │   ├── auth/              # Rotas de autenticação
+│   │   ├── ai/                # Rotas de produtos de IA
+│   │   ├── conversations/     # Rotas de conversas
+│   │   └── subscriptions/     # Rotas de assinaturas (MercadoPago)
+│   ├── dashboard/             # Página do dashboard
+│   ├── login/                 # Página de login
+│   ├── register/              # Página de registro
+│   ├── subscription/          # Páginas de assinatura
+│   └── page.tsx               # Página inicial
 ├── lib/
-│   ├── auth.ts           # Funções de autenticação
-│   ├── middleware.ts     # Middleware de autenticação
-│   └── prisma.ts         # Cliente Prisma
+│   ├── auth.ts               # Funções de autenticação
+│   ├── middleware.ts         # Middleware de autenticação
+│   ├── prisma.ts             # Cliente Prisma
+│   └── subscription.ts       # Funções de verificação de assinatura
 └── prisma/
-    └── schema.prisma     # Schema do banco de dados
+    └── schema.prisma         # Schema do banco de dados
 ```
 
 ## 🔐 Funcionalidades
@@ -73,12 +81,19 @@ npm run dev
 - ✅ Registro de usuários
 - ✅ Login e autenticação
 - ✅ Dashboard protegido
+- ✅ Sistema de Assinaturas com MercadoPago:
+  - Planos mensais e anuais
+  - Integração completa com MercadoPago
+  - Webhook para processar pagamentos
+  - Verificação de assinatura ativa
+  - Cancelamento de assinaturas
 - ✅ Assistente de IA integrado com Google Gemini:
   - Interface de conversa em tempo real
   - Suporte a textos longos e documentos (PDF, DOCX, imagens)
   - Histórico de conversa mantido
   - Processamento inteligente de conteúdo
   - Upload direto de arquivos para processamento
+  - Limite de 5 conversas por produto
 
 ## 🔧 Personalização
 
@@ -110,6 +125,12 @@ npm run dev
 - **Produção:** Use HTTPS e configure adequadamente os cookies e variáveis de ambiente.
 - **Upload de Arquivos:** A funcionalidade de upload de arquivos (PDF, DOCX, imagens) está totalmente integrada. Os arquivos são enviados diretamente para o Gemini como base64 para processamento.
 - **Gem "Balance Tradutor de Juridiquês":** Configurada via `systemInstruction` no código para traduzir textos jurídicos complexos para linguagem simples.
+- **Sistema de Assinaturas:** 
+  - Integração completa com MercadoPago para pagamentos
+  - Planos disponíveis: Mensal (R$ 29,90) e Anual (R$ 299,90)
+  - Webhook configurado para receber notificações de pagamento
+  - Verificação automática de assinatura ativa antes de usar produtos
+  - Para configurar o webhook em produção, acesse: https://www.mercadopago.com.br/developers/panel/app e configure a URL: `https://seudominio.com/api/subscriptions/webhook`
 
 ## 📄 Licença
 

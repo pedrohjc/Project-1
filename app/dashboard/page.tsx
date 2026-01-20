@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import Link from 'next/link'
 import Logo from '../../components/Logo'
 
 interface User {
@@ -18,6 +19,7 @@ interface Product {
   subtitle: string
   description: string
   icon: React.ReactNode
+  group: 'Pesquisa' | 'Redação'
 }
 
 interface Message {
@@ -64,7 +66,12 @@ export default function DashboardPage() {
     confirmPassword: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
-  const [recentProducts, setRecentProducts] = useState<Product[]>([])
+  const [selectedGroup, setSelectedGroup] = useState<'Todos' | 'Pesquisa' | 'Redação'>('Todos')
+  const [recentProducts, setRecentProducts] = useState<Array<{
+    product: Product
+    lastConversationTitle: string
+  }>>([])
+  const [pendingReviewCount, setPendingReviewCount] = useState(0)
 
   useEffect(() => {
     checkAuth()
@@ -266,6 +273,23 @@ export default function DashboardPage() {
   }
 
   const handleProductSelect = async (product: Product) => {
+    // TODO: REATIVAR EM PRODUÇÃO - Verificação de assinatura desabilitada para desenvolvimento
+    // Verificar assinatura antes de selecionar produto
+    // try {
+    //   const response = await fetch('/api/subscriptions/status')
+    //   if (response.ok) {
+    //     const data = await response.json()
+    //     if (!data.hasSubscription || data.subscription?.status !== 'active') {
+    //       if (confirm('Você precisa de uma assinatura ativa para usar os produtos.\n\nDeseja ir para a página de assinaturas?')) {
+    //         router.push('/subscription')
+    //       }
+    //       return
+    //     }
+    //   }
+    // } catch (err) {
+    //   console.error('Erro ao verificar assinatura:', err)
+    // }
+
     setSelectedProduct(product)
     setActiveConversationId(null)
     setInput('')
@@ -431,9 +455,17 @@ export default function DashboardPage() {
         const fileInput = document.getElementById('file-input') as HTMLInputElement
         if (fileInput) fileInput.value = ''
       } else {
-        // Mostrar mensagem de erro mais amigável
+        // TODO: REATIVAR EM PRODUÇÃO - Verificação de assinatura desabilitada para desenvolvimento
+        // Verificar se é erro de assinatura
+        // if (data.requiresSubscription) {
+        //   if (confirm(`${data.message || 'Você precisa de uma assinatura ativa para usar os produtos.'}\n\nDeseja ir para a página de assinaturas?`)) {
+        //     router.push('/subscription')
+        //   }
+        // } else {
+        //   Mostrar mensagem de erro mais amigável
         const errorMessage = data.error || 'Erro ao processar. Tente novamente.'
         alert(errorMessage)
+        // }
       }
     } catch (err) {
       alert('Erro ao processar. Tente novamente.')
@@ -719,35 +751,40 @@ export default function DashboardPage() {
       title: 'Balance Tradutor Juridiquês',
       subtitle: 'Traduza juridiquês para linguagem simples',
       description: 'Transforme textos jurídicos complexos em linguagem clara e acessível. Ideal para contratos, documentos legais e termos técnicos.',
-      icon: <TradutorJuridiquesIcon />
+      icon: <TradutorJuridiquesIcon />,
+      group: 'Redação'
     },
     {
       id: 'checklist-tributario',
       title: 'Balance Checklist Tributário',
       subtitle: 'Checklists completos para serviços tributários',
       description: 'Gere checklists claros e completos de documentos fiscais e contábeis. Agilize a coleta documental e fortaleça a percepção de valor.',
-      icon: <ChecklistTributarioIcon />
+      icon: <ChecklistTributarioIcon />,
+      group: 'Pesquisa'
     },
     {
       id: 'criador-conteudo',
       title: 'Balance Criador de Conteúdo Jurídico Ético',
       subtitle: 'Crie conteúdo ético para redes sociais',
       description: 'Gere ideias criativas, roteiros e legendas para posts jurídicos em redes sociais. Conteúdo ético, educativo e engajador.',
-      icon: <CriadorConteudoIcon />
+      icon: <CriadorConteudoIcon />,
+      group: 'Redação'
     },
     {
       id: 'quebra-objecoes',
       title: 'Balance Comercial Quebra de Objeções com PNL',
       subtitle: 'Quebre objeções e feche mais contratos',
       description: 'Aprenda a responder objeções comerciais com técnicas de PNL e persuasão. Transforme resistências em oportunidades de fechamento.',
-      icon: <QuebraObjecoesIcon />
+      icon: <QuebraObjecoesIcon />,
+      group: 'Redação'
     },
     {
       id: 'organizador-propostas',
       title: 'Balance Organizador – Propostas e Honorários',
       subtitle: 'Crie propostas claras e atrativas',
       description: 'Estruture propostas de honorários éticas e atrativas. Destaque o valor do serviço, organize fases do processo e quebre objeções.',
-      icon: <OrganizadorPropostasIcon />
+      icon: <OrganizadorPropostasIcon />,
+      group: 'Redação'
     }
   ]
 
@@ -761,37 +798,55 @@ export default function DashboardPage() {
         const allConversations = data.conversations || []
         
         // Extrair productIds únicos ordenados por data de uso mais recente
-        const productUsageMap = new Map<string, string>()
+        const productUsageMap = new Map<string, { updatedAt: string; title: string | null }>()
         allConversations.forEach((conv: Conversation) => {
           if (!productUsageMap.has(conv.productId) || 
-              new Date(conv.updatedAt) > new Date(productUsageMap.get(conv.productId)!)) {
-            productUsageMap.set(conv.productId, conv.updatedAt)
+              new Date(conv.updatedAt) > new Date(productUsageMap.get(conv.productId)!.updatedAt)) {
+            productUsageMap.set(conv.productId, {
+              updatedAt: conv.updatedAt,
+              title: conv.title
+            })
           }
         })
         
         // Ordenar por data mais recente
         const sortedProductIds = Array.from(productUsageMap.entries())
-          .sort((a, b) => new Date(b[1]).getTime() - new Date(a[1]).getTime())
-          .map(([productId]) => productId)
+          .sort((a, b) => new Date(b[1].updatedAt).getTime() - new Date(a[1].updatedAt).getTime())
+          .map(([productId, info]) => ({ productId, info }))
           .slice(0, 5) // Limitar a 5 produtos mais recentes
         
         // Mapear para objetos Product (products está definido abaixo)
         const recentProductsList = sortedProductIds
-          .map(id => products.find(p => p.id === id))
-          .filter((p): p is Product => p !== undefined)
+          .map(({ productId, info }) => {
+            const product = products.find(p => p.id === productId)
+            if (!product) return null
+            return {
+              product,
+              lastConversationTitle: info.title || 'Última conversa'
+            }
+          })
+          .filter((p): p is { product: Product; lastConversationTitle: string } => p !== null)
         
         setRecentProducts(recentProductsList)
+
+        const pendingCount = allConversations.filter((conv: Conversation) => {
+          if (!conv.messages || conv.messages.length === 0) return false
+          const lastMessage = conv.messages[conv.messages.length - 1]
+          return lastMessage.role === 'assistant'
+        }).length
+        setPendingReviewCount(pendingCount)
       }
     } catch (err) {
       console.error('Erro ao carregar produtos recentes:', err)
     }
   }
 
+  // Carregar produtos recentes quando o usuário estiver logado
   useEffect(() => {
-    if (user && products.length > 0) {
+    if (user) {
       loadRecentProducts()
     }
-  }, [user, products])
+  }, [user])
 
   // Função para obter o ícone do produto baseado no ID
   const getProductIcon = (productId: string) => {
@@ -827,6 +882,108 @@ export default function DashboardPage() {
       default:
         return 'Balance Assistant'
     }
+  }
+
+  const renderRecentProductsSidebar = () => {
+    const recentItems = recentProducts.filter(({ product }) => product.id !== selectedProduct?.id)
+
+    return (
+      <div style={{
+        width: '280px',
+        borderLeft: '1px solid var(--balance-border)',
+        background: 'white',
+        padding: '20px',
+        overflowY: 'auto',
+        flexShrink: 0,
+        position: 'fixed',
+        top: '85px',
+        right: 0,
+        height: 'calc(100vh - 85px)',
+        zIndex: 50
+      }}>
+        <h3 style={{
+          fontSize: '1rem',
+          fontWeight: '600',
+          color: 'var(--balance-text)',
+          marginBottom: '16px',
+          paddingBottom: '12px',
+          borderBottom: '1px solid var(--balance-border)'
+        }}>
+          Produtos Recentes
+        </h3>
+        {recentItems.length === 0 ? (
+          <div style={{
+            fontSize: '0.85rem',
+            color: 'var(--balance-text-light)',
+            lineHeight: '1.5'
+          }}>
+            Nenhum produto recente ainda.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {recentItems.map(({ product, lastConversationTitle }) => (
+              <div
+                key={product.id}
+                onClick={() => handleProductSelect(product)}
+                style={{
+                  padding: '12px',
+                  border: '1px solid var(--balance-border)',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  background: 'var(--balance-bg-light)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--balance-primary)'
+                  e.currentTarget.style.background = 'white'
+                  e.currentTarget.style.transform = 'translateX(4px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--balance-border)'
+                  e.currentTarget.style.background = 'var(--balance-bg-light)'
+                  e.currentTarget.style.transform = 'translateX(0)'
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  marginBottom: '8px'
+                }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {getProductIcon(product.id)}
+                  </div>
+                  <h4 style={{
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    color: 'var(--balance-text)',
+                    margin: 0,
+                    lineHeight: '1.3'
+                  }}>
+                    {product.title}
+                  </h4>
+                </div>
+                <p style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--balance-text-light)',
+                  margin: 0,
+                  lineHeight: '1.4'
+                }}>
+                  {lastConversationTitle}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )
   }
 
   // Função para obter o placeholder baseado no produto
@@ -1022,6 +1179,26 @@ export default function DashboardPage() {
                 >
                   👤 Meu Perfil
                 </button>
+                <Link
+                  href="/subscription"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    color: 'var(--balance-text)',
+                    transition: 'background 0.2s ease',
+                    textDecoration: 'none',
+                    display: 'block'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  💳 Minha Assinatura
+                </Link>
                 <div style={{
                   height: '1px',
                   background: 'var(--balance-border)',
@@ -1053,8 +1230,30 @@ export default function DashboardPage() {
 
       {!selectedProduct ? (
         // Tela de seleção de produtos
-        <div style={{ flex: 1, padding: '40px 24px', overflow: 'auto', background: 'var(--balance-bg)', position: 'relative' }}>
-          <div className="container">
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          <div style={{ flex: 1, padding: '40px 24px', paddingRight: '320px', overflow: 'auto', background: 'var(--balance-bg)', position: 'relative' }}>
+            <div className="container">
+              <div style={{
+                marginBottom: '2rem',
+                paddingBottom: '1.5rem',
+                borderBottom: '1px solid var(--balance-border)'
+              }}>
+                <h2 style={{
+                  fontSize: '2rem',
+                  marginBottom: '0.5rem',
+                  color: 'var(--balance-text)',
+                  fontWeight: '700',
+                  letterSpacing: '-0.01em'
+                }}>
+                  Bem-vindo de volta{user?.name ? `, ${user.name}.` : '.'}
+                </h2>
+                <p style={{
+                  color: 'var(--balance-text-light)',
+                  fontSize: '1rem'
+                }}>
+                  Você tem <span style={{ fontWeight: 700 }}>{pendingReviewCount} conversa{pendingReviewCount === 1 ? '' : 's'}</span> respondida{pendingReviewCount === 1 ? '' : 's'} aguardando revisão.
+                </p>
+              </div>
             <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
               <h2 style={{ 
                 fontSize: '2rem', 
@@ -1068,7 +1267,8 @@ export default function DashboardPage() {
               <p style={{ 
                 color: 'var(--balance-text-light)', 
                 fontSize: '1.1rem',
-                fontWeight: '400'
+                fontWeight: '400',
+                marginBottom: '1rem'
               }}>
                 Escolha um produto para começar a usar
               </p>
@@ -1077,7 +1277,7 @@ export default function DashboardPage() {
             {/* Campo de pesquisa */}
             <div style={{ 
               maxWidth: '600px', 
-              margin: '0 auto 3rem',
+              margin: '0 auto 1.5rem',
               position: 'relative'
             }}>
               <div style={{
@@ -1151,6 +1351,36 @@ export default function DashboardPage() {
               </div>
             </div>
 
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end', 
+                gap: '12px', 
+                margin: '0 auto 24px',
+                maxWidth: '800px',
+                flexWrap: 'wrap'
+              }}>
+                {(['Todos', 'Pesquisa', 'Redação'] as const).map((group) => (
+                  <button
+                    key={group}
+                    type="button"
+                    onClick={() => setSelectedGroup(group)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '10px',
+                      border: selectedGroup === group ? '1px solid #d7e3f6' : '1px solid var(--balance-border)',
+                      background: selectedGroup === group ? 'white' : 'var(--balance-bg-light)',
+                      color: selectedGroup === group ? 'var(--balance-text)' : 'var(--balance-text-light)',
+                      fontWeight: selectedGroup === group ? '600' : '500',
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {group}
+                  </button>
+                ))}
+              </div>
+
             {/* Filtrar produtos baseado na pesquisa */}
             {(() => {
               const filteredProducts = products.filter(product => {
@@ -1161,6 +1391,9 @@ export default function DashboardPage() {
                   product.subtitle.toLowerCase().includes(search) ||
                   product.description.toLowerCase().includes(search)
                 )
+              }).filter(product => {
+                if (selectedGroup === 'Todos') return true
+                return product.group === selectedGroup
               })
 
               if (filteredProducts.length === 0) {
@@ -1214,129 +1447,165 @@ export default function DashboardPage() {
                   className="card"
                   style={{
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    border: '2px solid var(--balance-border)',
-                    padding: '32px',
+                    transition: 'all 0.25s ease',
+                    border: '1px solid #e6eef9',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    background: 'white',
+                    boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
                   }}
                     onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--balance-primary)'
+                    e.currentTarget.style.borderColor = 'rgba(0, 102, 255, 0.35)'
                     e.currentTarget.style.transform = 'translateY(-4px)'
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(127, 179, 213, 0.2)'
+                    e.currentTarget.style.boxShadow = '0 12px 28px rgba(15, 23, 42, 0.12)'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--balance-border)'
+                    e.currentTarget.style.borderColor = '#e6eef9'
                     e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = '0 4px 20px var(--balance-shadow)'
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(15, 23, 42, 0.06)'
                   }}
                 >
-                  <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
-                    {product.icon}
-                  </div>
-                  <h3 style={{ 
-                    fontSize: '1.5rem', 
-                    marginBottom: '0.5rem', 
-                    color: 'var(--balance-primary)', 
-                    fontWeight: '600', 
-                    textAlign: 'center',
-                    letterSpacing: '-0.01em'
-                  }}>
-                    {product.title}
-                  </h3>
-                  <p style={{ 
-                    fontSize: '1rem', 
-                    marginBottom: '0.75rem', 
-                    color: 'var(--balance-primary)', 
-                    fontWeight: '500', 
-                    textAlign: 'center'
-                  }}>
-                    {product.subtitle}
-                  </p>
-                  <p style={{ 
-                    color: 'var(--balance-text-light)', 
-                    fontSize: '0.95rem', 
-                    lineHeight: '1.6', 
-                    textAlign: 'center'
-                  }}>
-                    {product.description}
-                  </p>
-                  <div style={{ 
-                    marginTop: '20px', 
-                    paddingTop: '20px', 
-                    borderTop: '1px solid var(--balance-border)', 
-                    textAlign: 'center' 
-                  }}>
-                    <span style={{ 
-                      color: 'var(--balance-primary)', 
-                      fontWeight: '600', 
-                      fontSize: '0.9rem'
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.12), rgba(0, 102, 255, 0.04))',
+                      border: '1px solid rgba(0, 102, 255, 0.12)'
                     }}>
-                      Clique para usar →
-                    </span>
+                      {product.icon}
+                    </div>
                   </div>
+                  <div>
+                    <h3 style={{
+                      fontSize: '1.2rem',
+                      marginBottom: '6px',
+                      color: 'var(--balance-text)',
+                      fontWeight: '700',
+                      letterSpacing: '-0.01em'
+                    }}>
+                      {product.title}
+                    </h3>
+                    <p style={{
+                      fontSize: '0.95rem',
+                      marginBottom: '8px',
+                      color: 'var(--balance-text-light)',
+                      fontWeight: '500'
+                    }}>
+                      {product.subtitle}
+                    </p>
+                    <p style={{
+                      color: 'var(--balance-text-light)',
+                      fontSize: '0.92rem',
+                      lineHeight: '1.6',
+                      marginBottom: '16px'
+                    }}>
+                      {product.description}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    style={{
+                      marginTop: 'auto',
+                      padding: '10px 16px',
+                      borderRadius: '10px',
+                      border: '1px solid #d7e3f6',
+                      background: 'white',
+                      color: 'var(--balance-text)',
+                      fontWeight: '600',
+                      fontSize: '0.9rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(0, 102, 255, 0.4)'
+                      e.currentTarget.style.color = 'var(--balance-primary)'
+                      e.currentTarget.style.boxShadow = '0 6px 14px rgba(15, 23, 42, 0.08)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = '#d7e3f6'
+                      e.currentTarget.style.color = 'var(--balance-text)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }}
+                  >
+                    Iniciar Ferramenta <span>→</span>
+                  </button>
                 </div>
                   ))}
                 </div>
               )
             })()}
-          </div>
+            </div>
 
-          {/* Botão flutuante do WhatsApp */}
-          <div
-            style={{
-              position: 'fixed',
-              bottom: '24px',
-              right: '24px',
-              zIndex: 1000,
-              cursor: 'pointer',
-              transition: 'transform 0.3s ease',
-              boxShadow: 'none'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.1)'
-              e.currentTarget.style.boxShadow = 'none'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)'
-              e.currentTarget.style.boxShadow = 'none'
-            }}
-            onClick={() => {
-              // Por enquanto apenas mostra um alerta, depois será substituído pelo link do WhatsApp
-              alert('Em breve você poderá entrar em contato conosco pelo WhatsApp!')
-            }}
-            title="Fale conosco pelo WhatsApp"
-          >
-            <div style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              background: '#25D366',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              overflow: 'hidden',
-              border: 'none',
-              outline: 'none'
-            }}>
-              {/* Ícone do WhatsApp */}
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
-                  fill="white"
-                />
-              </svg>
+            {/* Botão flutuante do WhatsApp */}
+            <div
+              style={{
+                position: 'fixed',
+                bottom: '24px',
+                right: '24px',
+                zIndex: 1000,
+                cursor: 'pointer',
+                transition: 'transform 0.3s ease',
+                boxShadow: 'none'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
+              onClick={() => {
+                // Por enquanto apenas mostra um alerta, depois será substituído pelo link do WhatsApp
+                alert('Em breve você poderá entrar em contato conosco pelo WhatsApp!')
+              }}
+              title="Fale conosco pelo WhatsApp"
+            >
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: '#25D366',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                border: 'none',
+                outline: 'none'
+              }}>
+                {/* Ícone do WhatsApp */}
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+                    fill="white"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
+          {renderRecentProductsSidebar()}
         </div>
       ) : (
         // Interface do produto com abas
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', paddingRight: '320px' }}>
           {/* Abas de conversas */}
           <div style={{
             background: 'white',
@@ -1920,91 +2189,7 @@ export default function DashboardPage() {
             </div>
             </div>
 
-            {/* Sidebar - Produtos Recentes */}
-            {recentProducts.length > 0 && (
-              <div style={{
-                width: '280px',
-                borderLeft: '1px solid var(--balance-border)',
-                background: 'white',
-                padding: '20px',
-                overflowY: 'auto',
-                flexShrink: 0
-              }}>
-                <h3 style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  color: 'var(--balance-text)',
-                  marginBottom: '16px',
-                  paddingBottom: '12px',
-                  borderBottom: '1px solid var(--balance-border)'
-                }}>
-                  Chats Recentes
-                </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {recentProducts
-                    .filter(p => p.id !== selectedProduct?.id) // Não mostrar o produto atual
-                    .map((product) => (
-                      <div
-                        key={product.id}
-                        onClick={() => handleProductSelect(product)}
-                        style={{
-                          padding: '12px',
-                          border: '1px solid var(--balance-border)',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          background: 'var(--balance-bg-light)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--balance-primary)'
-                          e.currentTarget.style.background = 'white'
-                          e.currentTarget.style.transform = 'translateX(4px)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--balance-border)'
-                          e.currentTarget.style.background = 'var(--balance-bg-light)'
-                          e.currentTarget.style.transform = 'translateX(0)'
-                        }}
-                      >
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: '10px',
-                          marginBottom: '8px'
-                        }}>
-                          <div style={{ 
-                            width: '32px', 
-                            height: '32px', 
-                            flexShrink: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}>
-                            {getProductIcon(product.id)}
-                          </div>
-                          <h4 style={{
-                            fontSize: '0.9rem',
-                            fontWeight: '600',
-                            color: 'var(--balance-text)',
-                            margin: 0,
-                            lineHeight: '1.3'
-                          }}>
-                            {product.title}
-                          </h4>
-                        </div>
-                        <p style={{
-                          fontSize: '0.8rem',
-                          color: 'var(--balance-text-light)',
-                          margin: 0,
-                          lineHeight: '1.4'
-                        }}>
-                          {product.subtitle}
-                        </p>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            )}
+            {renderRecentProductsSidebar()}
           </div>
         </div>
       )}
