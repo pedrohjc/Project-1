@@ -72,6 +72,9 @@ export default function DashboardPage() {
     lastConversationTitle: string
   }>>([])
   const [pendingReviewCount, setPendingReviewCount] = useState(0)
+  const monthlyTokenLimit = 1000
+  const tokensUsed = 0
+  const tokensResetLabel = 'hoje'
 
   useEffect(() => {
     checkAuth()
@@ -1194,6 +1197,18 @@ export default function DashboardPage() {
                 >
                   💳 Minha Assinatura
                 </Link>
+                <div style={{
+                  padding: '12px 16px',
+                  fontSize: '0.85rem',
+                  color: 'var(--balance-text-light)'
+                }}>
+                  <div style={{ fontWeight: 600, color: 'var(--balance-text)' }}>
+                    🧮 Tokens do mês: {tokensUsed} / {monthlyTokenLimit}
+                  </div>
+                  <div style={{ marginTop: '4px' }}>
+                    Reset em: {tokensResetLabel}
+                  </div>
+                </div>
                 <div style={{
                   height: '1px',
                   background: 'var(--balance-border)',
