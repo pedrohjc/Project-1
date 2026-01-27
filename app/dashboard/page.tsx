@@ -890,16 +890,11 @@ export default function DashboardPage() {
     return (
       <div style={{
         width: '280px',
-        borderLeft: '1px solid var(--balance-border)',
+        borderRight: '1px solid var(--balance-border)',
         background: 'white',
         padding: '20px',
         overflowY: 'auto',
-        flexShrink: 0,
-        position: 'fixed',
-        top: '85px',
-        right: 0,
-        height: 'calc(100vh - 85px)',
-        zIndex: 50
+        flexShrink: 0
       }}>
         <h3 style={{
           fontSize: '1rem',
@@ -1231,7 +1226,8 @@ export default function DashboardPage() {
       {!selectedProduct ? (
         // Tela de seleção de produtos
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-          <div style={{ flex: 1, padding: '40px 24px', paddingRight: '320px', overflow: 'auto', background: 'var(--balance-bg)', position: 'relative' }}>
+          {renderRecentProductsSidebar()}
+          <div style={{ flex: 1, padding: '40px 24px', overflow: 'auto', background: 'var(--balance-bg)', position: 'relative' }}>
             <div className="container">
               <div style={{
                 marginBottom: '2rem',
@@ -1601,21 +1597,22 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-          {renderRecentProductsSidebar()}
         </div>
       ) : (
         // Interface do produto com abas
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', paddingRight: '320px' }}>
-          {/* Abas de conversas */}
-          <div style={{
-            background: 'white',
-            borderBottom: '1px solid var(--balance-border)',
-            padding: '8px 16px',
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            flexShrink: 0
-          }}>
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          {renderRecentProductsSidebar()}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            {/* Abas de conversas */}
+            <div style={{
+              background: 'white',
+              borderBottom: '1px solid var(--balance-border)',
+              padding: '8px 16px',
+              display: 'flex',
+              gap: '8px',
+              overflowX: 'auto',
+              flexShrink: 0
+            }}>
             <button
               onClick={handleNewConversation}
               style={{
@@ -2064,7 +2061,7 @@ export default function DashboardPage() {
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = 'var(--balance-border)'
                       e.currentTarget.style.background = 'var(--balance-bg-light)'
-                      e.currentTarget.style.opacity = fileProcessing || processing ? 0.5 : 1
+                      e.currentTarget.style.opacity = fileProcessing || processing ? '0.5' : '1'
                     }}
                   >
                     📎
@@ -2187,11 +2184,10 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            </div>
-
-            {renderRecentProductsSidebar()}
+          </div>
           </div>
         </div>
+      </div>
       )}
 
       {/* Modal de Perfil */}
