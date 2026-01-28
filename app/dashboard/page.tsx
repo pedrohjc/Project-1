@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import Link from 'next/link'
+import Image from 'next/image'
 import Logo from '../../components/Logo'
 
 interface User {
@@ -72,8 +73,8 @@ export default function DashboardPage() {
     lastConversationTitle: string
   }>>([])
   const [pendingReviewCount, setPendingReviewCount] = useState(0)
-  const monthlyTokenLimit = 1000
-  const tokensUsed = 0
+  const [tokensUsed, setTokensUsed] = useState(15) // Valor de teste - remover depois
+  const monthlyTokenLimit = 50
   const tokensResetLabel = 'hoje'
 
   useEffect(() => {
@@ -390,6 +391,12 @@ export default function DashboardPage() {
     // Permitir enviar se tem mensagem OU arquivo(s)
     if ((!input.trim() && selectedFiles.length === 0) || processing || !selectedProduct) return
 
+    // Verificar limite de tokens
+    if (tokensUsed >= monthlyTokenLimit) {
+      alert('Você atingiu o limite de créditos de IA deste mês. Aguarde o reset ou entre em contato para obter mais créditos.')
+      return
+    }
+
     // Verificar limite de conversas antes de criar uma nova
     if (!activeConversationId) {
       const currentProductConversations = conversations.filter(c => c.productId === selectedProduct.id)
@@ -453,6 +460,8 @@ export default function DashboardPage() {
         
         // Definir conversa ativa
         setActiveConversationId(data.conversation.id)
+        // Incrementar contador de tokens (1 token por mensagem enviada)
+        setTokensUsed(prev => prev + 1)
         // Limpar arquivos após envio bem-sucedido
         setSelectedFiles([])
         const fileInput = document.getElementById('file-input') as HTMLInputElement
@@ -890,96 +899,339 @@ export default function DashboardPage() {
   const renderRecentProductsSidebar = () => {
     const recentItems = recentProducts.filter(({ product }) => product.id !== selectedProduct?.id)
 
+    const usagePercentage = Math.round((tokensUsed / monthlyTokenLimit) * 100)
+    
     return (
       <div style={{
         width: '280px',
+        height: '100vh',
+        position: 'fixed',
+        top: 0,
+        left: 0,
         borderRight: '1px solid var(--balance-border)',
         background: 'white',
-        padding: '20px',
-        overflowY: 'auto',
-        flexShrink: 0
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        zIndex: 100
       }}>
-        <h3 style={{
-          fontSize: '1rem',
-          fontWeight: '600',
-          color: 'var(--balance-text)',
-          marginBottom: '16px',
-          paddingBottom: '12px',
-          borderBottom: '1px solid var(--balance-border)'
+        {/* Logo no topo */}
+        <div style={{
+          padding: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderBottom: '1px solid var(--balance-border)',
+          flexShrink: 0
         }}>
-          Produtos Recentes
-        </h3>
-        {recentItems.length === 0 ? (
-          <div style={{
-            fontSize: '0.85rem',
-            color: 'var(--balance-text-light)',
-            lineHeight: '1.5'
+          <Image
+            src="/balance-logo.png"
+            alt="Balance"
+            width={150}
+            height={50}
+            style={{ objectFit: 'contain', height: 'auto' }}
+            priority
+          />
+        </div>
+        
+        {/* Área scrollável - Produtos Recentes */}
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '20px',
+          marginBottom: '16px'
+        }}>
+          <h3 style={{
+            fontSize: '1rem',
+            fontWeight: '600',
+            color: 'var(--balance-text)',
+            marginBottom: '16px',
+            paddingBottom: '12px',
+            borderBottom: '1px solid var(--balance-border)'
           }}>
-            Nenhum produto recente ainda.
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {recentItems.map(({ product, lastConversationTitle }) => (
-              <div
-                key={product.id}
-                onClick={() => handleProductSelect(product)}
-                style={{
-                  padding: '12px',
-                  border: '1px solid var(--balance-border)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  background: 'var(--balance-bg-light)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--balance-primary)'
-                  e.currentTarget.style.background = 'white'
-                  e.currentTarget.style.transform = 'translateX(4px)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--balance-border)'
-                  e.currentTarget.style.background = 'var(--balance-bg-light)'
-                  e.currentTarget.style.transform = 'translateX(0)'
-                }}
-              >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  marginBottom: '8px'
-                }}>
+            Produtos Recentes
+          </h3>
+          {recentItems.length === 0 ? (
+            <div style={{
+              fontSize: '0.85rem',
+              color: 'var(--balance-text-light)',
+              lineHeight: '1.5'
+            }}>
+              Nenhum produto recente ainda.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {recentItems.map(({ product, lastConversationTitle }) => (
+                <div
+                  key={product.id}
+                  onClick={() => handleProductSelect(product)}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid var(--balance-border)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    background: 'var(--balance-bg-light)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--balance-primary)'
+                    e.currentTarget.style.background = 'white'
+                    e.currentTarget.style.transform = 'translateX(4px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--balance-border)'
+                    e.currentTarget.style.background = 'var(--balance-bg-light)'
+                    e.currentTarget.style.transform = 'translateX(0)'
+                  }}
+                >
                   <div style={{
-                    width: '32px',
-                    height: '32px',
-                    flexShrink: 0,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    gap: '10px',
+                    marginBottom: '8px'
                   }}>
-                    {getProductIcon(product.id)}
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {getProductIcon(product.id)}
+                    </div>
+                    <h4 style={{
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      color: 'var(--balance-text)',
+                      margin: 0,
+                      lineHeight: '1.3'
+                    }}>
+                      {product.title}
+                    </h4>
                   </div>
-                  <h4 style={{
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    color: 'var(--balance-text)',
+                  <p style={{
+                    fontSize: '0.8rem',
+                    color: 'var(--balance-text-light)',
                     margin: 0,
-                    lineHeight: '1.3'
+                    lineHeight: '1.4'
                   }}>
-                    {product.title}
-                  </h4>
+                    {lastConversationTitle}
+                  </p>
                 </div>
-                <p style={{
-                  fontSize: '0.8rem',
-                  color: 'var(--balance-text-light)',
-                  margin: 0,
-                  lineHeight: '1.4'
-                }}>
-                  {lastConversationTitle}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Token Counter - Fixo no final */}
+        <div style={{
+          padding: '16px 20px 20px 20px',
+          borderTop: '1px solid var(--balance-border)',
+          flexShrink: 0
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+            borderRadius: '12px',
+            padding: '16px',
+            border: '1px solid var(--balance-border)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '12px'
+            }}>
+              <span style={{ fontSize: '1.1rem' }}>🎯</span>
+              <span style={{
+                fontSize: '0.85rem',
+                fontWeight: '600',
+                color: 'var(--balance-text)'
+              }}>
+                Créditos de IA
+              </span>
+            </div>
+            
+            <div style={{
+              fontSize: '0.8rem',
+              color: 'var(--balance-text-light)',
+              marginBottom: '8px'
+            }}>
+              <span style={{ fontWeight: '600', color: 'var(--balance-text)' }}>
+                {tokensUsed.toLocaleString()}
+              </span>
+              {' / '}
+              <span>{monthlyTokenLimit.toLocaleString()}</span>
+              {' usados este mês'}
+            </div>
+            
+            {/* Progress Bar */}
+            <div style={{
+              width: '100%',
+              height: '10px',
+              background: '#e2e8f0',
+              borderRadius: '5px',
+              overflow: 'hidden',
+              marginBottom: '8px'
+            }}>
+              <div style={{
+                width: `${usagePercentage}%`,
+                minWidth: usagePercentage > 0 ? '8px' : '0px',
+                height: '100%',
+                background: usagePercentage > 80 
+                  ? '#ef4444'
+                  : usagePercentage > 50 
+                    ? '#f59e0b'
+                    : '#32c8a7',
+                borderRadius: '5px',
+                transition: 'width 0.3s ease'
+              }} />
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: '0.75rem',
+              color: 'var(--balance-text-light)'
+            }}>
+              <span>{usagePercentage}% utilizado</span>
+              <span>Reset: {tokensResetLabel}</span>
+            </div>
           </div>
-        )}
+          
+          {/* User Profile */}
+          <div 
+            data-user-menu
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            style={{
+              marginTop: '16px',
+              background: 'var(--balance-primary)',
+              borderRadius: '12px',
+              padding: '12px',
+              cursor: 'pointer',
+              position: 'relative'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: '600',
+                fontSize: '1rem'
+              }}>
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  color: 'white',
+                  fontWeight: '600',
+                  fontSize: '0.9rem',
+                  marginBottom: '2px'
+                }}>
+                  {user?.name || 'Usuário'}
+                </div>
+                <div style={{
+                  color: 'rgba(255,255,255,0.7)',
+                  fontSize: '0.75rem'
+                }}>
+                  {user?.email || ''}
+                </div>
+              </div>
+            </div>
+            
+            {/* Dropdown Menu */}
+            {showUserMenu && (
+              <div style={{
+                position: 'absolute',
+                bottom: '100%',
+                left: 0,
+                right: 0,
+                marginBottom: '8px',
+                background: 'white',
+                border: '1px solid var(--balance-border)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                overflow: 'hidden',
+                zIndex: 200
+              }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowUserMenu(false)
+                    handleOpenProfile()
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '12px 16px',
+                    color: 'var(--balance-text)',
+                    background: 'none',
+                    border: 'none',
+                    width: '100%',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    fontSize: '0.9rem',
+                    textAlign: 'left'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  👤 Meu Perfil
+                </button>
+                <Link
+                  href="/subscription"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '12px 16px',
+                    color: 'var(--balance-text)',
+                    textDecoration: 'none',
+                    transition: 'background 0.2s',
+                    fontSize: '0.9rem'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  💳 Minha Assinatura
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '12px 16px',
+                    color: '#dc2626',
+                    background: 'none',
+                    border: 'none',
+                    width: '100%',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    fontSize: '0.9rem',
+                    textAlign: 'left'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#fef2f2'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  🚪 Sair
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     )
   }
@@ -1056,19 +1308,20 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--balance-bg-light)', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <header style={{ 
-        background: 'white',
-        borderBottom: '1px solid var(--balance-border)',
-        padding: '16px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexShrink: 0,
-        boxShadow: '0 1px 3px rgba(28, 43, 58, 0.05)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {selectedProduct && (
+      {/* Header - só aparece quando um produto está selecionado */}
+      {selectedProduct && (
+        <header style={{ 
+          background: 'white',
+          borderBottom: '1px solid var(--balance-border)',
+          padding: '16px 24px',
+          marginLeft: '280px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexShrink: 0,
+          boxShadow: '0 1px 3px rgba(28, 43, 58, 0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button
               onClick={handleBackToProducts}
               style={{
@@ -1087,162 +1340,22 @@ export default function DashboardPage() {
             >
               ←
             </button>
-          )}
-          <Logo size="medium" />
-          {selectedProduct && (
             <span style={{ 
-              color: 'var(--balance-text-light)', 
-              fontSize: '0.9rem',
-              fontWeight: '500'
+              color: 'var(--balance-text)', 
+              fontSize: '1rem',
+              fontWeight: '600'
             }}>
-              / {selectedProduct.title}
+              {selectedProduct.title}
             </span>
-          )}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', position: 'relative' }}>
-          {/* Menu de usuário */}
-          <div style={{ position: 'relative' }} data-user-menu>
-            <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '8px 12px',
-                borderRadius: '8px',
-                transition: 'background 0.2s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-            >
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: 'var(--balance-primary)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '0.9rem',
-                fontWeight: '600'
-              }}>
-                {user?.name?.charAt(0).toUpperCase() || 'U'}
-              </div>
-              <span style={{ 
-                color: 'var(--balance-text)', 
-                fontSize: '0.9rem',
-                fontWeight: '500'
-              }}>
-                {user?.name}
-              </span>
-              <span style={{ color: 'var(--balance-text-light)', fontSize: '0.8rem' }}>
-                ▼
-              </span>
-            </button>
-
-            {/* Dropdown menu */}
-            {showUserMenu && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                marginTop: '8px',
-                background: 'white',
-                border: '1px solid var(--balance-border)',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                minWidth: '200px',
-                zIndex: 1000,
-                overflow: 'hidden'
-              }}>
-                <button
-                  onClick={handleOpenProfile}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    background: 'none',
-                    border: 'none',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    color: 'var(--balance-text)',
-                    transition: 'background 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                >
-                  👤 Meu Perfil
-                </button>
-                <Link
-                  href="/subscription"
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    background: 'none',
-                    border: 'none',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    color: 'var(--balance-text)',
-                    transition: 'background 0.2s ease',
-                    textDecoration: 'none',
-                    display: 'block'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                >
-                  💳 Minha Assinatura
-                </Link>
-                <div style={{
-                  padding: '12px 16px',
-                  fontSize: '0.85rem',
-                  color: 'var(--balance-text-light)'
-                }}>
-                  <div style={{ fontWeight: 600, color: 'var(--balance-text)' }}>
-                    🧮 Tokens do mês: {tokensUsed} / {monthlyTokenLimit}
-                  </div>
-                  <div style={{ marginTop: '4px' }}>
-                    Reset em: {tokensResetLabel}
-                  </div>
-                </div>
-                <div style={{
-                  height: '1px',
-                  background: 'var(--balance-border)',
-                  margin: '4px 0'
-                }} />
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    background: 'none',
-                    border: 'none',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    color: 'var(--balance-text)',
-                    transition: 'background 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                >
-                  🚪 Sair
-                </button>
-              </div>
-            )}
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {!selectedProduct ? (
         // Tela de seleção de produtos
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           {renderRecentProductsSidebar()}
-          <div style={{ flex: 1, padding: '40px 24px', overflow: 'auto', background: 'var(--balance-bg)', position: 'relative' }}>
+          <div style={{ flex: 1, padding: '40px 24px', overflow: 'auto', background: 'var(--balance-bg)', position: 'relative', marginLeft: '280px' }}>
             <div className="container">
               <div style={{
                 marginBottom: '2rem',
@@ -1617,7 +1730,7 @@ export default function DashboardPage() {
         // Interface do produto com abas
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           {renderRecentProductsSidebar()}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', marginLeft: '280px' }}>
             {/* Abas de conversas */}
             <div style={{
               background: 'white',
