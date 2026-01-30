@@ -530,230 +530,128 @@ export default function DashboardPage() {
 
   const activeConversation = conversations.find(c => c.id === activeConversationId)
 
-  // Logo do Balance Tradutor Juridiquês
+  // Ícones modernos e simplificados para os produtos
+  
+  // Tradutor Juridiquês - Ícone de documento com setas de tradução
   const TradutorJuridiquesIcon = () => (
     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient)"/>
-      <path d="M40 20L30 25V35H25V45H30V55H40L50 55V45H55V35H50V25L40 20Z" fill="white" opacity="0.95"/>
-      <line x1="35" y1="30" x2="45" y2="30" stroke="url(#gradient)" strokeWidth="2" strokeLinecap="round"/>
-      <line x1="35" y1="35" x2="45" y2="35" stroke="url(#gradient)" strokeWidth="2" strokeLinecap="round"/>
-      <line x1="35" y1="40" x2="42" y2="40" stroke="url(#gradient)" strokeWidth="2" strokeLinecap="round"/>
-      <path d="M20 50L25 45M20 50L25 55M20 50H60" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M60 50L55 45M60 50L55 55" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="25" cy="65" r="3" fill="white" opacity="0.8"/>
-      <circle cx="35" cy="65" r="3" fill="white" opacity="0.8"/>
-      <circle cx="45" cy="65" r="3" fill="white" opacity="0.8"/>
-      <defs>
-        <linearGradient id="gradient" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0066ff"/>
-          <stop offset="1" stopColor="#7928ca"/>
-        </linearGradient>
-      </defs>
+      <rect width="80" height="80" rx="16" fill="#8B5CF6"/>
+      <rect x="24" y="18" width="32" height="44" rx="4" fill="white"/>
+      <rect x="28" y="26" width="18" height="3" rx="1.5" fill="#8B5CF6" opacity="0.6"/>
+      <rect x="28" y="33" width="24" height="3" rx="1.5" fill="#8B5CF6" opacity="0.4"/>
+      <rect x="28" y="40" width="20" height="3" rx="1.5" fill="#8B5CF6" opacity="0.4"/>
+      <path d="M32 52L28 56L32 60" stroke="#8B5CF6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M48 52L52 56L48 60" stroke="#8B5CF6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 
   const TradutorJuridiquesIconSmall = () => (
-    <svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-small)"/>
-      <path d="M40 20L30 25V35H25V45H30V55H40L50 55V45H55V35H50V25L40 20Z" fill="white" opacity="0.95"/>
-      <defs>
-        <linearGradient id="gradient-small" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0066ff"/>
-          <stop offset="1" stopColor="#7928ca"/>
-        </linearGradient>
-      </defs>
+    <svg width="48" height="48" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="16" fill="#8B5CF6"/>
+      <rect x="24" y="18" width="32" height="44" rx="4" fill="white"/>
+      <rect x="28" y="26" width="18" height="3" rx="1.5" fill="#8B5CF6" opacity="0.6"/>
+      <rect x="28" y="33" width="24" height="3" rx="1.5" fill="#8B5CF6" opacity="0.4"/>
+      <rect x="28" y="40" width="20" height="3" rx="1.5" fill="#8B5CF6" opacity="0.4"/>
+      <path d="M32 52L28 56L32 60" stroke="#8B5CF6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M48 52L52 56L48 60" stroke="#8B5CF6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 
-  // Logo do Balance Checklist Tributário
+  // Checklist Tributário - Ícone de lista com checkmarks
   const ChecklistTributarioIcon = () => (
     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-checklist)"/>
-      {/* Checklist/Lista com checkmarks */}
-      <rect x="20" y="18" width="40" height="4" rx="2" fill="white" opacity="0.95"/>
-      <rect x="20" y="28" width="32" height="4" rx="2" fill="white" opacity="0.95"/>
-      <rect x="20" y="38" width="36" height="4" rx="2" fill="white" opacity="0.95"/>
-      {/* Checkmarks */}
-      <path d="M25 22L27 24L31 20" stroke="url(#gradient-checklist)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      <path d="M25 32L27 34L31 30" stroke="url(#gradient-checklist)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      {/* Ícone de calculadora/impostos na parte inferior */}
-      <rect x="28" y="48" width="24" height="20" rx="2" fill="white" opacity="0.95"/>
-      <line x1="32" y1="52" x2="44" y2="52" stroke="url(#gradient-checklist)" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="32" y1="56" x2="44" y2="56" stroke="url(#gradient-checklist)" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="32" y1="60" x2="40" y2="60" stroke="url(#gradient-checklist)" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="36" y1="64" x2="44" y2="64" stroke="url(#gradient-checklist)" strokeWidth="1.5" strokeLinecap="round"/>
-      <defs>
-        <linearGradient id="gradient-checklist" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0066ff"/>
-          <stop offset="1" stopColor="#00c853"/>
-        </linearGradient>
-      </defs>
+      <rect width="80" height="80" rx="16" fill="#10B981"/>
+      <rect x="22" y="18" width="36" height="44" rx="4" fill="white"/>
+      <path d="M28 30L32 34L40 26" stroke="#10B981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      <rect x="44" y="28" width="10" height="3" rx="1.5" fill="#10B981" opacity="0.4"/>
+      <path d="M28 44L32 48L40 40" stroke="#10B981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      <rect x="44" y="42" width="10" height="3" rx="1.5" fill="#10B981" opacity="0.4"/>
+      <circle cx="34" cy="57" r="4" stroke="#10B981" strokeWidth="2.5" fill="none"/>
+      <rect x="44" y="55" width="10" height="3" rx="1.5" fill="#10B981" opacity="0.4"/>
     </svg>
   )
 
   const ChecklistTributarioIconSmall = () => (
-    <svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-checklist-small)"/>
-      <rect x="20" y="18" width="40" height="4" rx="2" fill="white" opacity="0.95"/>
-      <rect x="20" y="28" width="32" height="4" rx="2" fill="white" opacity="0.95"/>
-      <path d="M25 22L27 24L31 20" stroke="url(#gradient-checklist-small)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      <defs>
-        <linearGradient id="gradient-checklist-small" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0066ff"/>
-          <stop offset="1" stopColor="#00c853"/>
-        </linearGradient>
-      </defs>
+    <svg width="48" height="48" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="16" fill="#10B981"/>
+      <rect x="22" y="18" width="36" height="44" rx="4" fill="white"/>
+      <path d="M28 30L32 34L40 26" stroke="#10B981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      <rect x="44" y="28" width="10" height="3" rx="1.5" fill="#10B981" opacity="0.4"/>
+      <path d="M28 44L32 48L40 40" stroke="#10B981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      <rect x="44" y="42" width="10" height="3" rx="1.5" fill="#10B981" opacity="0.4"/>
     </svg>
   )
 
-  // Logo do Balance Criador de Conteúdo Jurídico Ético
+  // Criador de Conteúdo - Ícone de caneta/edição
   const CriadorConteudoIcon = () => (
     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-conteudo)"/>
-      {/* Celular */}
-      <rect x="28" y="18" width="24" height="36" rx="4" fill="white" opacity="0.95"/>
-      <rect x="30" y="20" width="20" height="28" rx="2" fill="url(#gradient-conteudo)"/>
-      <circle cx="40" cy="52" r="2" fill="white" opacity="0.8"/>
-      {/* Ícones de mídia/social */}
-      <circle cx="20" cy="35" r="4" fill="white" opacity="0.9"/>
-      <circle cx="60" cy="28" r="3" fill="white" opacity="0.9"/>
-      <circle cx="62" cy="50" r="3.5" fill="white" opacity="0.9"/>
-      {/* Linhas de conexão */}
-      <line x1="24" y1="35" x2="30" y2="32" stroke="white" strokeWidth="1.5" opacity="0.6" strokeLinecap="round"/>
-      <line x1="56" y1="28" x2="52" y2="26" stroke="white" strokeWidth="1.5" opacity="0.6" strokeLinecap="round"/>
-      <line x1="58" y1="50" x2="52" y2="48" stroke="white" strokeWidth="1.5" opacity="0.6" strokeLinecap="round"/>
-      {/* Símbolo de câmera/vídeo */}
-      <circle cx="40" cy="28" r="3" fill="white" opacity="0.8"/>
-      <circle cx="40" cy="28" r="1.5" fill="url(#gradient-conteudo)"/>
-      {/* Linha de onda/áudio */}
-      <path d="M32 40 L35 37 L38 40 L41 36 L44 40" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.8"/>
-      <defs>
-        <linearGradient id="gradient-conteudo" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#ff6b6b"/>
-          <stop offset="1" stopColor="#4ecdc4"/>
-        </linearGradient>
-      </defs>
+      <rect width="80" height="80" rx="16" fill="#F43F5E"/>
+      <rect x="22" y="22" width="36" height="40" rx="4" fill="white"/>
+      <rect x="28" y="30" width="24" height="3" rx="1.5" fill="#F43F5E" opacity="0.4"/>
+      <rect x="28" y="37" width="18" height="3" rx="1.5" fill="#F43F5E" opacity="0.4"/>
+      <rect x="28" y="44" width="20" height="3" rx="1.5" fill="#F43F5E" opacity="0.4"/>
+      <path d="M48 50L56 42L62 48L54 56H48V50Z" fill="#F43F5E"/>
+      <path d="M56 42L60 38L66 44L62 48L56 42Z" fill="#F43F5E" opacity="0.7"/>
     </svg>
   )
 
   const CriadorConteudoIconSmall = () => (
-    <svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-conteudo-small)"/>
-      <rect x="28" y="18" width="24" height="36" rx="4" fill="white" opacity="0.95"/>
-      <rect x="30" y="20" width="20" height="28" rx="2" fill="url(#gradient-conteudo-small)"/>
-      <circle cx="40" cy="52" r="2" fill="white" opacity="0.8"/>
-      <circle cx="20" cy="35" r="4" fill="white" opacity="0.9"/>
-      <circle cx="60" cy="28" r="3" fill="white" opacity="0.9"/>
-      <defs>
-        <linearGradient id="gradient-conteudo-small" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#ff6b6b"/>
-          <stop offset="1" stopColor="#4ecdc4"/>
-        </linearGradient>
-      </defs>
+    <svg width="48" height="48" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="16" fill="#F43F5E"/>
+      <rect x="22" y="22" width="36" height="40" rx="4" fill="white"/>
+      <rect x="28" y="30" width="24" height="3" rx="1.5" fill="#F43F5E" opacity="0.4"/>
+      <rect x="28" y="37" width="18" height="3" rx="1.5" fill="#F43F5E" opacity="0.4"/>
+      <path d="M48 50L56 42L62 48L54 56H48V50Z" fill="#F43F5E"/>
     </svg>
   )
 
-  // Logo do Balance Comercial Quebra de Objeções com PNL
+  // Quebra de Objeções - Ícone de chat/conversa
   const QuebraObjecoesIcon = () => (
     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-comercial)"/>
-      {/* Gráfico/Comercial - seta para cima */}
-      <path d="M40 20 L30 35 L35 35 L35 50 L45 50 L45 35 L50 35 Z" fill="white" opacity="0.95"/>
-      {/* Letra P */}
-      <rect x="22" y="55" width="3" height="12" fill="white" opacity="0.95"/>
-      <rect x="22" y="55" width="8" height="3" fill="white" opacity="0.95"/>
-      <rect x="28" y="55" width="3" height="6" fill="white" opacity="0.95"/>
-      <rect x="22" y="60" width="6" height="3" fill="white" opacity="0.95"/>
-      {/* Letra N */}
-      <rect x="33" y="55" width="3" height="12" fill="white" opacity="0.95"/>
-      <path d="M33 55 L39 67 L42 67 L36 55 Z" fill="white" opacity="0.95"/>
-      <rect x="39" y="55" width="3" height="12" fill="white" opacity="0.95"/>
-      {/* Letra L */}
-      <rect x="45" y="55" width="3" height="12" fill="white" opacity="0.95"/>
-      <rect x="45" y="64" width="8" height="3" fill="white" opacity="0.95"/>
-      {/* Linha de conexão/comunicação */}
-      <path d="M20 45 Q40 50, 60 45" stroke="white" strokeWidth="2" opacity="0.7" fill="none" strokeLinecap="round"/>
-      {/* Círculos de conexão */}
-      <circle cx="25" cy="45" r="2" fill="white" opacity="0.8"/>
-      <circle cx="55" cy="45" r="2" fill="white" opacity="0.8"/>
-      <defs>
-        <linearGradient id="gradient-comercial" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#f093fb"/>
-          <stop offset="1" stopColor="#f5576c"/>
-        </linearGradient>
-      </defs>
+      <rect width="80" height="80" rx="16" fill="#3B82F6"/>
+      <rect x="18" y="20" width="32" height="24" rx="4" fill="white"/>
+      <rect x="24" y="28" width="20" height="3" rx="1.5" fill="#3B82F6" opacity="0.5"/>
+      <rect x="24" y="35" width="14" height="3" rx="1.5" fill="#3B82F6" opacity="0.3"/>
+      <path d="M18 44L18 52L28 44H18Z" fill="white"/>
+      <rect x="30" y="36" width="32" height="24" rx="4" fill="white" opacity="0.9"/>
+      <rect x="36" y="44" width="20" height="3" rx="1.5" fill="#3B82F6" opacity="0.5"/>
+      <rect x="36" y="51" width="14" height="3" rx="1.5" fill="#3B82F6" opacity="0.3"/>
+      <path d="M62 60L62 68L52 60H62Z" fill="white" opacity="0.9"/>
     </svg>
   )
 
   const QuebraObjecoesIconSmall = () => (
-    <svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-comercial-small)"/>
-      <path d="M40 20 L30 35 L35 35 L35 50 L45 50 L45 35 L50 35 Z" fill="white" opacity="0.95"/>
-      <rect x="22" y="55" width="3" height="12" fill="white" opacity="0.95"/>
-      <rect x="22" y="55" width="8" height="3" fill="white" opacity="0.95"/>
-      <rect x="28" y="55" width="3" height="6" fill="white" opacity="0.95"/>
-      <rect x="22" y="60" width="6" height="3" fill="white" opacity="0.95"/>
-      <rect x="33" y="55" width="3" height="12" fill="white" opacity="0.95"/>
-      <path d="M33 55 L39 67 L42 67 L36 55 Z" fill="white" opacity="0.95"/>
-      <rect x="39" y="55" width="3" height="12" fill="white" opacity="0.95"/>
-      <rect x="45" y="55" width="3" height="12" fill="white" opacity="0.95"/>
-      <rect x="45" y="64" width="8" height="3" fill="white" opacity="0.95"/>
-      <defs>
-        <linearGradient id="gradient-comercial-small" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#f093fb"/>
-          <stop offset="1" stopColor="#f5576c"/>
-        </linearGradient>
-      </defs>
+    <svg width="48" height="48" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="16" fill="#3B82F6"/>
+      <rect x="18" y="20" width="32" height="24" rx="4" fill="white"/>
+      <rect x="24" y="28" width="20" height="3" rx="1.5" fill="#3B82F6" opacity="0.5"/>
+      <rect x="24" y="35" width="14" height="3" rx="1.5" fill="#3B82F6" opacity="0.3"/>
+      <rect x="30" y="36" width="32" height="24" rx="4" fill="white" opacity="0.9"/>
+      <rect x="36" y="44" width="20" height="3" rx="1.5" fill="#3B82F6" opacity="0.5"/>
     </svg>
   )
 
-  // Logo do Balance Organizador – Propostas e Honorários
+  // Organizador de Propostas - Ícone de documento/proposta
   const OrganizadorPropostasIcon = () => (
     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-organizador)"/>
-      {/* Relógio */}
-      <circle cx="40" cy="35" r="18" fill="white" opacity="0.95"/>
-      <circle cx="40" cy="35" r="15" fill="url(#gradient-organizador)"/>
-      {/* Ponteiros do relógio */}
-      <line x1="40" y1="35" x2="40" y2="25" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      <line x1="40" y1="35" x2="47" y2="35" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-      {/* Marcadores do relógio */}
-      <circle cx="40" cy="20" r="1.5" fill="white"/>
-      <circle cx="55" cy="35" r="1.5" fill="white"/>
-      <circle cx="40" cy="50" r="1.5" fill="white"/>
-      <circle cx="25" cy="35" r="1.5" fill="white"/>
-      {/* Dinheiro/Moeda */}
-      <circle cx="40" cy="60" r="12" fill="white" opacity="0.95"/>
-      <circle cx="40" cy="60" r="9" fill="url(#gradient-organizador)"/>
-      {/* Símbolo de cifrão */}
-      <path d="M35 58 L35 62 M37 58 L37 62 M43 58 L43 62 M45 58 L45 62" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      <rect x="38" y="59" width="4" height="2" fill="white"/>
-      <defs>
-        <linearGradient id="gradient-organizador" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#ffd700"/>
-          <stop offset="1" stopColor="#ff8c00"/>
-        </linearGradient>
-      </defs>
+      <rect width="80" height="80" rx="16" fill="#F59E0B"/>
+      <rect x="22" y="16" width="36" height="48" rx="4" fill="white"/>
+      <rect x="28" y="24" width="24" height="3" rx="1.5" fill="#F59E0B" opacity="0.6"/>
+      <rect x="28" y="31" width="18" height="3" rx="1.5" fill="#F59E0B" opacity="0.4"/>
+      <rect x="28" y="38" width="20" height="3" rx="1.5" fill="#F59E0B" opacity="0.4"/>
+      <line x1="28" y1="48" x2="52" y2="48" stroke="#F59E0B" strokeWidth="1" opacity="0.3"/>
+      <text x="40" y="58" textAnchor="middle" fill="#F59E0B" fontSize="14" fontWeight="bold">R$</text>
     </svg>
   )
 
   const OrganizadorPropostasIconSmall = () => (
-    <svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#gradient-organizador-small)"/>
-      <circle cx="40" cy="35" r="18" fill="white" opacity="0.95"/>
-      <circle cx="40" cy="35" r="15" fill="url(#gradient-organizador-small)"/>
-      <line x1="40" y1="35" x2="40" y2="25" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      <line x1="40" y1="35" x2="47" y2="35" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-      <circle cx="40" cy="60" r="12" fill="white" opacity="0.95"/>
-      <circle cx="40" cy="60" r="9" fill="url(#gradient-organizador-small)"/>
-      <path d="M35 58 L35 62 M37 58 L37 62 M43 58 L43 62 M45 58 L45 62" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      <rect x="38" y="59" width="4" height="2" fill="white"/>
-      <defs>
-        <linearGradient id="gradient-organizador-small" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#ffd700"/>
-          <stop offset="1" stopColor="#ff8c00"/>
-        </linearGradient>
-      </defs>
+    <svg width="48" height="48" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="16" fill="#F59E0B"/>
+      <rect x="22" y="16" width="36" height="48" rx="4" fill="white"/>
+      <rect x="28" y="24" width="24" height="3" rx="1.5" fill="#F59E0B" opacity="0.6"/>
+      <rect x="28" y="31" width="18" height="3" rx="1.5" fill="#F59E0B" opacity="0.4"/>
+      <rect x="28" y="38" width="20" height="3" rx="1.5" fill="#F59E0B" opacity="0.4"/>
+      <text x="40" y="56" textAnchor="middle" fill="#F59E0B" fontSize="14" fontWeight="bold">R$</text>
     </svg>
   )
 

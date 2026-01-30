@@ -83,7 +83,7 @@ export default function Home() {
             letterSpacing: '-0.02em',
             lineHeight: '1.2'
           }}>
-            Automação que libera seu time
+            Balance Agents
           </h1>
           
           <p style={{ 
