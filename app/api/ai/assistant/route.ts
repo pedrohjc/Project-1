@@ -4,7 +4,7 @@ import { getUserIdFromRequest } from '@/lib/middleware'
 import { checkUserSubscription } from '@/lib/subscription'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const genAI = new GoogleGenerativeAI("AIzaSyCOwRqIllm41rcBjUWyMqLr2ey_76RRRbo")
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
 
 // Mapeamento de produtos para configurações do Gemini
 // Tente estes modelos nesta ordem: gemini-pro (mais estável), gemini-1.5-flash, gemini-1.5-pro
