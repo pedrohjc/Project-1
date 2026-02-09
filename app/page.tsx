@@ -8,22 +8,25 @@ export default function Home() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: 'var(--balance-bg)'
+      background: `radial-gradient(circle at top left, rgba(120, 182, 213, 0.2), transparent 55%),
+        radial-gradient(circle at 20% 20%, rgba(46, 196, 166, 0.18), transparent 55%),
+        var(--balance-bg)`
     }}>
       {/* Header fixo */}
       <header style={{
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid var(--balance-border)',
+        background: 'rgba(244, 245, 246, 0.9)',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(28, 44, 59, 0.12)',
         padding: '16px 20px'
       }}>
         <div className="container" style={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
-          alignItems: 'center' 
+          alignItems: 'center',
+          gap: '16px'
       }}>
         <Logo size="medium" />
           <div style={{ display: 'flex', gap: '1rem' }}>
@@ -38,7 +41,7 @@ export default function Home() {
                 transition: 'all 0.3s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--balance-bg-light)'
+                e.currentTarget.style.background = 'rgba(120, 182, 213, 0.12)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent'
@@ -51,7 +54,8 @@ export default function Home() {
               className="btn btn-primary"
               style={{ 
                 padding: '8px 20px',
-                fontSize: '0.95rem'
+                fontSize: '0.95rem',
+                borderRadius: '999px'
               }}
             >
               Criar Conta
@@ -69,11 +73,29 @@ export default function Home() {
         padding: '80px 20px',
         position: 'relative',
         background: `linear-gradient(135deg, 
-          var(--balance-bg-light) 0%, 
-          #ffffff 50%, 
-          var(--balance-bg-light) 100%)`
+          rgba(255, 255, 255, 0.65) 0%, 
+          rgba(255, 255, 255, 0.9) 50%, 
+          rgba(244, 245, 246, 0.7) 100%)`
       }}>
       <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '6px 14px',
+            borderRadius: '999px',
+            background: 'var(--balance-glass)',
+            border: '1px solid var(--balance-glass-border)',
+            boxShadow: '0 14px 30px rgba(28, 44, 59, 0.12)',
+            marginBottom: '1.5rem',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.75rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.18em',
+            color: 'var(--balance-text-light)'
+          }}>
+            Tecnologia acessivel
+          </div>
           <h1 style={{ 
             fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
             marginBottom: '1.5rem', 
@@ -108,7 +130,7 @@ export default function Home() {
             elimina tarefas repetitivas e libera tempo para o que realmente importa.
           </p>
         
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link 
               href="/register" 
             className="btn btn-primary" 
@@ -171,11 +193,33 @@ export default function Home() {
           }}>
             <div className="card" style={{ textAlign: 'center' }}>
               <div style={{
-                fontSize: '3rem',
-                marginBottom: '1rem',
-                fontWeight: '800',
-                color: 'var(--balance-primary)'
-              }}>🎯</div>
+                width: '56px',
+                height: '56px',
+                margin: '0 auto 1rem',
+                borderRadius: '18px',
+                display: 'grid',
+                placeItems: 'center',
+                background: 'var(--balance-glass-strong)',
+                border: '1px solid var(--balance-glass-border)'
+              }}>
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ color: 'var(--balance-text)' }}
+                  aria-hidden="true"
+                >
+                  <path d="M12 2v8" />
+                  <path d="M5 10h14" />
+                  <path d="M7 10v6a5 5 0 0 0 10 0v-6" />
+                  <path d="M4 20h16" />
+                </svg>
+              </div>
               <h3 style={{ 
                 fontSize: '1.5rem', 
                 marginBottom: '1rem',
@@ -195,11 +239,31 @@ export default function Home() {
 
             <div className="card" style={{ textAlign: 'center' }}>
               <div style={{
-                fontSize: '3rem',
-                marginBottom: '1rem',
-                fontWeight: '800',
-                color: 'var(--balance-primary)'
-              }}>💡</div>
+                width: '56px',
+                height: '56px',
+                margin: '0 auto 1rem',
+                borderRadius: '18px',
+                display: 'grid',
+                placeItems: 'center',
+                background: 'var(--balance-glass-strong)',
+                border: '1px solid var(--balance-glass-border)'
+              }}>
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ color: 'var(--balance-text)' }}
+                  aria-hidden="true"
+                >
+                  <path d="M12 3a6 6 0 0 0-3 11v3h6v-3a6 6 0 0 0-3-11Z" />
+                  <path d="M9 20h6" />
+                </svg>
+              </div>
               <h3 style={{ 
                 fontSize: '1.5rem', 
                 marginBottom: '1rem',
@@ -219,11 +283,30 @@ export default function Home() {
 
             <div className="card" style={{ textAlign: 'center' }}>
               <div style={{
-                fontSize: '3rem',
-                marginBottom: '1rem',
-                fontWeight: '800',
-                color: 'var(--balance-primary)'
-              }}>⚡</div>
+                width: '56px',
+                height: '56px',
+                margin: '0 auto 1rem',
+                borderRadius: '18px',
+                display: 'grid',
+                placeItems: 'center',
+                background: 'var(--balance-glass-strong)',
+                border: '1px solid var(--balance-glass-border)'
+              }}>
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ color: 'var(--balance-text)' }}
+                  aria-hidden="true"
+                >
+                  <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
+                </svg>
+              </div>
               <h3 style={{ 
                 fontSize: '1.5rem', 
                 marginBottom: '1rem',
@@ -296,24 +379,50 @@ export default function Home() {
               <div className="card" style={{ 
                 minWidth: '380px',
                 maxWidth: '380px',
-                borderTop: '4px solid var(--balance-primary)',
+                borderTop: '3px solid var(--balance-primary)',
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 flexShrink: 0
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 102, 255, 0.15)'
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(28, 44, 59, 0.2)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 20px var(--balance-shadow)'
+                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
               }}
               >
                 <div style={{ 
-                  fontSize: '3rem', 
-                  marginBottom: '1rem', 
-                  textAlign: 'center' 
-                }}>⚖️</div>
+                  width: '56px',
+                  height: '56px',
+                  margin: '0 auto 1rem',
+                  borderRadius: '18px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  background: 'var(--balance-glass-strong)',
+                  border: '1px solid var(--balance-glass-border)'
+                }}>
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: 'var(--balance-text)' }}
+                    aria-hidden="true"
+                  >
+                    <path d="M12 3v4" />
+                    <path d="M7 7h10" />
+                    <path d="M5 7 3 11h6L7 7Z" />
+                    <path d="M19 7 17 11h6l-2-4Z" />
+                    <path d="M6 17h12" />
+                    <path d="M9 17v2" />
+                    <path d="M15 17v2" />
+                  </svg>
+                </div>
                 <h3 style={{ 
                   fontSize: '1.5rem', 
                   marginBottom: '0.75rem',
@@ -353,24 +462,46 @@ export default function Home() {
               <div className="card" style={{ 
                 minWidth: '380px',
                 maxWidth: '380px',
-                borderTop: '4px solid #00c853',
+                borderTop: '3px solid var(--balance-autonomy)',
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 flexShrink: 0
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 200, 83, 0.15)'
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(46, 196, 166, 0.2)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 20px var(--balance-shadow)'
+                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
               }}
               >
                 <div style={{ 
-                  fontSize: '3rem', 
-                  marginBottom: '1rem', 
-                  textAlign: 'center' 
-                }}>✅</div>
+                  width: '56px',
+                  height: '56px',
+                  margin: '0 auto 1rem',
+                  borderRadius: '18px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  background: 'var(--balance-glass-strong)',
+                  border: '1px solid var(--balance-glass-border)'
+                }}>
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: 'var(--balance-text)' }}
+                    aria-hidden="true"
+                  >
+                    <path d="M4 7h16v10H4z" />
+                    <path d="m9 12 2 2 4-4" />
+                    <path d="M7 7V5h10v2" />
+                  </svg>
+                </div>
                 <h3 style={{ 
                   fontSize: '1.5rem', 
                   marginBottom: '0.75rem',
@@ -383,7 +514,7 @@ export default function Home() {
                 <p style={{ 
                   fontSize: '0.95rem',
                   marginBottom: '0.5rem',
-                  color: '#00c853',
+                  color: 'var(--balance-autonomy)',
                   fontWeight: '600',
                   textAlign: 'center'
                 }}>
@@ -410,24 +541,46 @@ export default function Home() {
               <div className="card" style={{ 
                 minWidth: '380px',
                 maxWidth: '380px',
-                borderTop: '4px solid #4ecdc4',
+                borderTop: '3px solid var(--balance-flow)',
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 flexShrink: 0
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(78, 205, 196, 0.15)'
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(120, 182, 213, 0.2)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 20px var(--balance-shadow)'
+                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
               }}
               >
                 <div style={{ 
-                  fontSize: '3rem', 
-                  marginBottom: '1rem', 
-                  textAlign: 'center' 
-                }}>📱</div>
+                  width: '56px',
+                  height: '56px',
+                  margin: '0 auto 1rem',
+                  borderRadius: '18px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  background: 'var(--balance-glass-strong)',
+                  border: '1px solid var(--balance-glass-border)'
+                }}>
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: 'var(--balance-text)' }}
+                    aria-hidden="true"
+                  >
+                    <rect x="7" y="3" width="10" height="18" rx="2" />
+                    <path d="M11 7h2" />
+                    <path d="M10 17h4" />
+                  </svg>
+                </div>
                 <h3 style={{ 
                   fontSize: '1.5rem', 
                   marginBottom: '0.75rem',
@@ -440,7 +593,7 @@ export default function Home() {
                 <p style={{ 
                   fontSize: '0.95rem',
                   marginBottom: '0.5rem',
-                  color: '#4ecdc4',
+                  color: 'var(--balance-flow)',
                   fontWeight: '600',
                   textAlign: 'center'
                 }}>
@@ -467,24 +620,46 @@ export default function Home() {
               <div className="card" style={{ 
                 minWidth: '380px',
                 maxWidth: '380px',
-                borderTop: '4px solid #f5576c',
+                borderTop: '3px solid var(--balance-secondary)',
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 flexShrink: 0
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(245, 87, 108, 0.15)'
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(92, 103, 112, 0.2)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 20px var(--balance-shadow)'
+                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
               }}
               >
                 <div style={{ 
-                  fontSize: '3rem', 
-                  marginBottom: '1rem', 
-                  textAlign: 'center' 
-                }}>💬</div>
+                  width: '56px',
+                  height: '56px',
+                  margin: '0 auto 1rem',
+                  borderRadius: '18px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  background: 'var(--balance-glass-strong)',
+                  border: '1px solid var(--balance-glass-border)'
+                }}>
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: 'var(--balance-text)' }}
+                    aria-hidden="true"
+                  >
+                    <path d="M4 6h16v9H8l-4 3z" />
+                    <path d="M8 10h8" />
+                    <path d="M8 13h5" />
+                  </svg>
+                </div>
                 <h3 style={{ 
                   fontSize: '1.5rem', 
                   marginBottom: '0.75rem',
@@ -497,7 +672,7 @@ export default function Home() {
                 <p style={{ 
                   fontSize: '0.95rem',
                   marginBottom: '0.5rem',
-                  color: '#f5576c',
+                  color: 'var(--balance-secondary)',
                   fontWeight: '600',
                   textAlign: 'center'
                 }}>
@@ -524,24 +699,46 @@ export default function Home() {
               <div className="card" style={{ 
                 minWidth: '380px',
                 maxWidth: '380px',
-                borderTop: '4px solid #ffd700',
+                borderTop: '3px solid var(--balance-primary)',
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 flexShrink: 0
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(255, 215, 0, 0.15)'
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(28, 44, 59, 0.2)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 20px var(--balance-shadow)'
+                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
               }}
               >
                 <div style={{ 
-                  fontSize: '3rem', 
-                  marginBottom: '1rem', 
-                  textAlign: 'center' 
-                }}>💰</div>
+                  width: '56px',
+                  height: '56px',
+                  margin: '0 auto 1rem',
+                  borderRadius: '18px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  background: 'var(--balance-glass-strong)',
+                  border: '1px solid var(--balance-glass-border)'
+                }}>
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: 'var(--balance-text)' }}
+                    aria-hidden="true"
+                  >
+                    <rect x="4" y="6" width="16" height="12" rx="2" />
+                    <path d="M8 10h8" />
+                    <path d="M8 14h4" />
+                  </svg>
+                </div>
                 <h3 style={{ 
                   fontSize: '1.5rem', 
                   marginBottom: '0.75rem',
@@ -554,7 +751,7 @@ export default function Home() {
                 <p style={{ 
                   fontSize: '0.95rem',
                   marginBottom: '0.5rem',
-                  color: '#ff8c00',
+                  color: 'var(--balance-primary)',
                   fontWeight: '600',
                   textAlign: 'center'
                 }}>
