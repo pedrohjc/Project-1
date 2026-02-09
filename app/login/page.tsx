@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Logo from '../../components/Logo'
+import SocialLogin from '../../components/SocialLogin'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -31,9 +33,8 @@ export default function LoginPage() {
         return
       }
 
-      // Redirecionar para o dashboard
       router.push('/dashboard')
-    } catch (err) {
+    } catch {
       setError('Erro ao conectar com o servidor')
       setLoading(false)
     }
@@ -43,32 +44,34 @@ export default function LoginPage() {
     <div style={{ 
       minHeight: '100vh', 
       display: 'flex', 
+      flexDirection: 'column',
       alignItems: 'center', 
       justifyContent: 'center', 
       padding: '20px',
+      paddingTop: '80px',
       background: 'var(--balance-bg)'
     }}>
-      <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h1 style={{ 
-            fontSize: '2rem', 
-            marginBottom: '0.5rem',
-            color: 'var(--balance-text)',
-            fontFamily: 'var(--font-brand)',
-            fontWeight: '900',
-            letterSpacing: '-0.02em'
-          }}>
-            Balance Studios
-          </h1>
+      <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'center' }}>
+        <Logo size="medium" />
+      </div>
+
+      <div className="card" style={{ width: '100%', maxWidth: '420px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <h2 style={{ 
             fontSize: '1.5rem', 
-            marginBottom: '1.5rem', 
+            marginBottom: '0.5rem', 
             color: 'var(--balance-text)',
-            fontWeight: '600'
+            fontWeight: '700',
+            fontFamily: 'var(--font-brand)',
           }}>
-            Login
+            Entrar
           </h2>
+          <p style={{ fontSize: '0.9rem', color: 'var(--balance-text-light)' }}>
+            Acesse sua conta Balance
+          </p>
         </div>
+
+        <SocialLogin mode="login" />
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">

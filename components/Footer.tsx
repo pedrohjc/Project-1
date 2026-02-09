@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="footer-brand">
           <Logo size="small" />
           <p className="footer-tagline">
-            Tecnologia acessivel, automacao inteligente e pessoas no centro.
+            Tecnologia acessível, automação inteligente e pessoas no centro.
           </p>
           <div className="footer-meta">
             <span>Balance Solutions</span>

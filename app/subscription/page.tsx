@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '../../components/Logo'
+import AgentsImpactCalculator from '../../components/agents/AgentsImpactCalculator'
 import './subscription.css'
 
 interface SubscriptionStatus {
@@ -18,28 +18,99 @@ interface SubscriptionStatus {
   } | null
 }
 
+const plans = [
+  {
+    id: 'essentials',
+    name: 'Essentials',
+    price: 'R$ 29,90',
+    period: 'por mês',
+    highlight: false,
+    badge: null,
+    description: '5 Agents prontos para o jurídico',
+    features: [
+      'Tradutor Juridiquês',
+      'Checklist Tributário',
+      'Conteúdo Jurídico Ético',
+      'Quebra de Objeções com PNL',
+      'Organizador de Propostas',
+      'Logs básicos',
+      'Suporte assíncrono',
+    ],
+    apiPlan: 'monthly' as const,
+  },
+  {
+    id: 'operations',
+    name: 'Operations',
+    price: 'R$ 169,86',
+    period: 'por mês',
+    highlight: true,
+    badge: 'Mais popular',
+    description: '10 Agents setoriais prontos',
+    features: [
+      'Tudo do Essentials',
+      'Conciliação de recibos',
+      'Cobrança inteligente',
+      'Fluxo de caixa',
+      'Calendário editorial',
+      'Análise de campanhas',
+      'Checklist de linha',
+      'Controle de qualidade',
+      'Planejamento de insumos',
+      'Triagem de chamados',
+      'Follow-up automático',
+      'Logs + revisão mensal',
+      'Chat + 1 call/mês',
+    ],
+    apiPlan: 'yearly' as const,
+  },
+  {
+    id: 'custom',
+    name: 'Custom Pro',
+    price: 'R$ 499,93',
+    period: 'por mês',
+    highlight: false,
+    badge: null,
+    description: 'Crie até 3 Agents personalizados',
+    features: [
+      'Tudo do Operations',
+      'Até 3 Agents custom (guiado)',
+      'Templates e modelos prontos',
+      'Validação manual opcional',
+      'Logs + versionamento de regras',
+      'Chat + 1 call de configuração',
+    ],
+    apiPlan: 'monthly' as const,
+  },
+  {
+    id: 'unlimited',
+    name: 'Unlimited',
+    price: 'R$ 999',
+    period: 'por mês',
+    highlight: false,
+    badge: 'Enterprise',
+    description: 'Agents ilimitados + governança forte',
+    features: [
+      'Tudo do Custom Pro',
+      'Agents ilimitados',
+      'Até 3 e-mails na mesma assinatura (mesmo consumo)',
+      'Governança completa (logs, versões, permissões)',
+      'SLA dedicado',
+      'Painel de auditoria',
+      'Suporte prioritário dedicado',
+      'Calls semanais de acompanhamento',
+    ],
+    apiPlan: 'yearly' as const,
+  },
+]
+
 export default function SubscriptionPage() {
-  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null)
   const [processing, setProcessing] = useState<string | null>(null)
 
   useEffect(() => {
-    checkAuth()
     loadSubscriptionStatus()
   }, [])
-
-  const checkAuth = async () => {
-    try {
-      const response = await fetch('/api/auth/me')
-      if (!response.ok) {
-        router.push('/login')
-        return
-      }
-    } catch (err) {
-      router.push('/login')
-    }
-  }
 
   const loadSubscriptionStatus = async () => {
     try {
@@ -67,7 +138,6 @@ export default function SubscriptionPage() {
       const data = await response.json()
 
       if (response.ok && data.initPoint) {
-        // Redirecionar para o checkout do MercadoPago
         window.location.href = data.initPoint
       } else {
         alert(`Erro: ${data.error || 'Erro ao criar preferência de pagamento'}`)
@@ -115,36 +185,55 @@ export default function SubscriptionPage() {
   const currentPlan = subscription?.subscription?.plan
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--balance-bg)' }}>
+    <div className="subscription-page">
       {/* Header */}
-      <header style={{
-        background: 'white',
-        borderBottom: '1px solid var(--balance-border)',
+      <header className="glass-header" style={{
         padding: '16px 24px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
         <Logo size="medium" />
-        <Link 
-          href="/dashboard"
-          style={{
-            padding: '8px 20px',
-            color: 'var(--balance-text)',
-            fontWeight: '600',
-            textDecoration: 'none',
-            borderRadius: '8px',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--balance-bg-light)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent'
-          }}
-        >
-          Voltar ao Dashboard
-        </Link>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <Link
+            href="/"
+            style={{
+              padding: '8px 20px',
+              color: 'var(--balance-text)',
+              fontWeight: '600',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(120, 182, 213, 0.12)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+            }}
+          >
+            Início
+          </Link>
+          <Link
+            href="/login"
+            style={{
+              padding: '8px 20px',
+              color: 'var(--balance-text)',
+              fontWeight: '600',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(120, 182, 213, 0.12)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+            }}
+          >
+            Entrar
+          </Link>
+        </div>
       </header>
 
       <div className="container" style={{ padding: '60px 20px' }}>
@@ -165,27 +254,29 @@ export default function SubscriptionPage() {
             maxWidth: '700px',
             margin: '0 auto'
           }}>
-            Desbloqueie todo o potencial da Balance Studios
+            Desbloqueie todo o potencial da Balance com o plano ideal para sua operação
           </p>
         </div>
+
+        <AgentsImpactCalculator />
 
         {/* Status da assinatura atual */}
         {isActive && (
           <div style={{
             maxWidth: '600px',
-            margin: '0 auto 3rem',
+            margin: '3rem auto',
             padding: '20px',
-            background: 'white',
-            borderRadius: '12px',
-            border: '2px solid var(--balance-primary)',
-            textAlign: 'center'
+            background: 'var(--balance-glass-strong)',
+            borderRadius: '16px',
+            border: '2px solid var(--balance-flow)',
+            textAlign: 'center',
+            backdropFilter: 'blur(18px)'
           }}>
-            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✅</div>
             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--balance-text)' }}>
               Assinatura Ativa
             </h3>
             <p style={{ color: 'var(--balance-text-light)', marginBottom: '1rem' }}>
-              Plano: <strong>{currentPlan === 'monthly' ? 'Mensal' : 'Anual'}</strong>
+              Plano: <strong>{currentPlan === 'monthly' ? 'Essentials' : currentPlan === 'yearly' ? 'Operations' : currentPlan}</strong>
             </p>
             {subscription?.subscription?.endDate && (
               <p style={{ color: 'var(--balance-text-light)', fontSize: '0.9rem', marginBottom: '1rem' }}>
@@ -205,216 +296,138 @@ export default function SubscriptionPage() {
         {/* Planos */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '2rem',
-          maxWidth: '1000px',
-          margin: '0 auto'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '1.5rem',
+          maxWidth: '1200px',
+          margin: '3rem auto 0'
         }}>
-          {/* Plano Mensal */}
-          <div className="card" style={{
-            border: isActive && currentPlan === 'monthly' ? '3px solid var(--balance-primary)' : '2px solid var(--balance-border)',
-            position: 'relative',
-            transition: 'all 0.3s ease'
-          }}>
-            {isActive && currentPlan === 'monthly' && (
-              <div style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'var(--balance-primary)',
-                color: 'white',
-                padding: '4px 12px',
-                borderRadius: '20px',
-                fontSize: '0.75rem',
-                fontWeight: '600'
-              }}>
-                Ativo
-              </div>
-            )}
-            <h3 style={{
-              fontSize: '1.75rem',
-              marginBottom: '1rem',
-              fontWeight: '700',
-              color: 'var(--balance-text)',
-              textAlign: 'center'
-            }}>
-              Plano Mensal
-            </h3>
-            <div style={{
-              fontSize: '3rem',
-              fontWeight: '800',
-              color: 'var(--balance-primary)',
-              textAlign: 'center',
-              marginBottom: '0.5rem'
-            }}>
-              R$ 29,90
-            </div>
-            <p style={{
-              textAlign: 'center',
-              color: 'var(--balance-text-light)',
-              marginBottom: '2rem',
-              fontSize: '0.9rem'
-            }}>
-              por mês
-            </p>
-            <ul style={{
-              listStyle: 'none',
-              padding: 0,
-              marginBottom: '2rem'
-            }}>
-              <li style={{ padding: '8px 0', color: 'var(--balance-text-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--balance-primary)' }}>✓</span>
-                Acesso a todos os produtos
-              </li>
-              <li style={{ padding: '8px 0', color: 'var(--balance-text-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--balance-primary)' }}>✓</span>
-                Suporte prioritário
-              </li>
-              <li style={{ padding: '8px 0', color: 'var(--balance-text-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--balance-primary)' }}>✓</span>
-                Atualizações constantes
-              </li>
-              <li style={{ padding: '8px 0', color: 'var(--balance-text-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--balance-primary)' }}>✓</span>
-                Cancelamento a qualquer momento
-              </li>
-            </ul>
-            {isActive && currentPlan === 'monthly' ? (
-              <button
-                className="btn btn-secondary"
-                style={{ width: '100%' }}
-                disabled
-              >
-                Plano Ativo
-              </button>
-            ) : (
-              <button
-                onClick={() => handleSubscribe('monthly')}
-                className="btn btn-primary"
-                style={{ width: '100%' }}
-                disabled={processing === 'monthly'}
-              >
-                {processing === 'monthly' ? 'Processando...' : 'Assinar Mensal'}
-              </button>
-            )}
-          </div>
+          {plans.map((plan) => (
+            <div
+              className="card"
+              key={plan.id}
+              style={{
+                position: 'relative',
+                borderTop: plan.highlight ? '3px solid var(--balance-flow)' : '3px solid var(--balance-primary)',
+                transition: 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)'
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(28, 44, 59, 0.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
+              }}
+            >
+              {plan.badge && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-12px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: plan.highlight ? 'var(--balance-flow)' : 'var(--balance-primary)',
+                  color: 'white',
+                  padding: '5px 14px',
+                  borderRadius: '999px',
+                  fontSize: '0.72rem',
+                  fontWeight: '600',
+                  fontFamily: 'var(--font-mono)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {plan.badge}
+                </div>
+              )}
 
-          {/* Plano Anual */}
-          <div className="card" style={{
-            border: isActive && currentPlan === 'yearly' ? '3px solid var(--balance-primary)' : '2px solid var(--balance-border)',
-            position: 'relative',
-            transition: 'all 0.3s ease',
-            transform: isActive && currentPlan === 'yearly' ? 'scale(1.05)' : 'scale(1)'
-          }}>
-            {isActive && currentPlan === 'yearly' && (
-              <div style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'var(--balance-primary)',
-                color: 'white',
-                padding: '4px 12px',
-                borderRadius: '20px',
-                fontSize: '0.75rem',
-                fontWeight: '600'
+              <h3 style={{
+                fontSize: '1.4rem',
+                marginBottom: '0.5rem',
+                fontWeight: '700',
+                color: 'var(--balance-text)',
+                textAlign: 'center'
               }}>
-                Ativo
+                {plan.name}
+              </h3>
+
+              <p style={{
+                textAlign: 'center',
+                color: 'var(--balance-text-light)',
+                fontSize: '0.9rem',
+                marginBottom: '1.5rem'
+              }}>
+                {plan.description}
+              </p>
+
+              <div style={{
+                fontSize: '2.4rem',
+                fontWeight: '800',
+                color: 'var(--balance-text)',
+                textAlign: 'center',
+                marginBottom: '0.25rem'
+              }}>
+                {plan.price}
               </div>
-            )}
-            <div style={{
-              position: 'absolute',
-              top: '-12px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              background: 'var(--balance-primary)',
-              color: 'white',
-              padding: '6px 16px',
-              borderRadius: '20px',
-              fontSize: '0.75rem',
-              fontWeight: '600'
-            }}>
-              Mais Popular
-            </div>
-            <h3 style={{
-              fontSize: '1.75rem',
-              marginBottom: '1rem',
-              fontWeight: '700',
-              color: 'var(--balance-text)',
-              textAlign: 'center'
-            }}>
-              Plano Anual
-            </h3>
-            <div style={{
-              fontSize: '3rem',
-              fontWeight: '800',
-              color: 'var(--balance-primary)',
-              textAlign: 'center',
-              marginBottom: '0.5rem'
-            }}>
-              R$ 299,90
-            </div>
-            <p style={{
-              textAlign: 'center',
-              color: 'var(--balance-text-light)',
-              marginBottom: '0.5rem',
-              fontSize: '0.9rem'
-            }}>
-              por ano
-            </p>
-            <p style={{
-              textAlign: 'center',
-              color: 'var(--balance-primary)',
-              fontWeight: '600',
-              marginBottom: '2rem',
-              fontSize: '0.9rem'
-            }}>
-              Economize 16% (R$ 24,90/mês)
-            </p>
-            <ul style={{
-              listStyle: 'none',
-              padding: 0,
-              marginBottom: '2rem'
-            }}>
-              <li style={{ padding: '8px 0', color: 'var(--balance-text-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--balance-primary)' }}>✓</span>
-                Acesso a todos os produtos
-              </li>
-              <li style={{ padding: '8px 0', color: 'var(--balance-text-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--balance-primary)' }}>✓</span>
-                Suporte prioritário
-              </li>
-              <li style={{ padding: '8px 0', color: 'var(--balance-text-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--balance-primary)' }}>✓</span>
-                Atualizações constantes
-              </li>
-              <li style={{ padding: '8px 0', color: 'var(--balance-text-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--balance-primary)' }}>✓</span>
-                Cancelamento a qualquer momento
-              </li>
-              <li style={{ padding: '8px 0', color: 'var(--balance-primary)', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}>
-                <span>🎁</span>
-                Economia de 16%
-              </li>
-            </ul>
-            {isActive && currentPlan === 'yearly' ? (
+
+              <p style={{
+                textAlign: 'center',
+                color: 'var(--balance-text-light)',
+                marginBottom: '1.5rem',
+                fontSize: '0.85rem'
+              }}>
+                {plan.period}
+              </p>
+
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                marginBottom: '1.5rem',
+                display: 'grid',
+                gap: '6px'
+              }}>
+                {plan.features.map((feature) => (
+                  <li key={feature} style={{
+                    padding: '6px 0',
+                    color: 'var(--balance-text-light)',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '8px',
+                    fontSize: '0.9rem',
+                    lineHeight: '1.4'
+                  }}>
+                    <span style={{ color: 'var(--balance-flow)', flexShrink: 0, marginTop: '2px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg>
+                    </span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
               <button
-                className="btn btn-secondary"
+                onClick={() => handleSubscribe(plan.apiPlan)}
+                className={plan.highlight ? 'btn btn-primary' : 'btn btn-secondary'}
                 style={{ width: '100%' }}
-                disabled
+                disabled={processing === plan.apiPlan}
               >
-                Plano Ativo
+                {processing === plan.apiPlan ? 'Processando...' : 'Assinar'}
               </button>
-            ) : (
-              <button
-                onClick={() => handleSubscribe('yearly')}
-                className="btn btn-primary"
-                style={{ width: '100%' }}
-                disabled={processing === 'yearly'}
+
+              <Link
+                href={`/subscription/${plan.id}`}
+                style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  marginTop: '10px',
+                  fontSize: '0.85rem',
+                  color: 'var(--balance-flow)',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                }}
               >
-                {processing === 'yearly' ? 'Processando...' : 'Assinar Anual'}
-              </button>
-            )}
-          </div>
+                Ver detalhes do plano →
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
     </div>

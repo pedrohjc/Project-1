@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface LogoProps {
   size?: 'small' | 'medium' | 'large'
@@ -18,17 +19,19 @@ export const Logo: React.FC<LogoProps> = ({
   const currentSize = sizeMap[size]
 
   return (
-    <Image
-      src="/balance-logo.png"
-      alt="Balance"
-      width={currentSize.width}
-      height={currentSize.height}
-      style={{
-        objectFit: 'contain',
-        height: 'auto'
-      }}
-      priority
-    />
+    <Link href="/" aria-label="Ir para a página inicial">
+      <Image
+        src="/balance-marca.svg"
+        alt="Balance"
+        width={currentSize.width}
+        height={currentSize.height}
+        style={{
+          objectFit: 'contain',
+          height: 'auto'
+        }}
+        priority
+      />
+    </Link>
   )
 }
 

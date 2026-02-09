@@ -5,6 +5,139 @@ import Logo from '../components/Logo'
 import './globals.css'
 
 export default function Home() {
+  const products = [
+    {
+      title: 'Balance Tradutor Juridiquês',
+      tagline: 'Traduza juridiquês para linguagem simples',
+      description:
+        'Transforme textos jurídicos complexos em linguagem clara e acessível. Ideal para contratos, documentos legais e termos técnicos.',
+      accent: 'var(--balance-flow)',
+      icon: (
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: 'var(--balance-text)' }}
+          aria-hidden="true"
+        >
+          <path d="M12 3v4" />
+          <path d="M7 7h10" />
+          <path d="M5 7 3 11h6L7 7Z" />
+          <path d="M19 7 17 11h6l-2-4Z" />
+          <path d="M6 17h12" />
+          <path d="M9 17v2" />
+          <path d="M15 17v2" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Balance Checklist Tributário',
+      tagline: 'Checklists completos para serviços tributários',
+      description:
+        'Gere checklists claros e completos de documentos fiscais e contábeis. Agilize a coleta documental e fortaleça a percepção de valor.',
+      accent: 'var(--balance-flow)',
+      icon: (
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: 'var(--balance-text)' }}
+          aria-hidden="true"
+        >
+          <path d="M4 7h16v10H4z" />
+          <path d="m9 12 2 2 4-4" />
+          <path d="M7 7V5h10v2" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Balance Criador de Conteúdo Jurídico Ético',
+      tagline: 'Crie conteúdo ético para redes sociais',
+      description:
+        'Gere ideias criativas, roteiros e legendas para posts jurídicos em redes sociais. Conteúdo ético, educativo e engajador.',
+      accent: 'var(--balance-flow)',
+      icon: (
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: 'var(--balance-text)' }}
+          aria-hidden="true"
+        >
+          <rect x="7" y="3" width="10" height="18" rx="2" />
+          <path d="M11 7h2" />
+          <path d="M10 17h4" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Balance Comercial Quebra de Objeções com PNL',
+      tagline: 'Quebre objeções e feche mais contratos',
+      description:
+        'Aprenda a responder objeções comerciais com técnicas de PNL e persuasão. Transforme resistências em oportunidades de fechamento.',
+      accent: 'var(--balance-flow)',
+      icon: (
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: 'var(--balance-text)' }}
+          aria-hidden="true"
+        >
+          <path d="M4 6h16v9H8l-4 3z" />
+          <path d="M8 10h8" />
+          <path d="M8 13h5" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Balance Organizador - Propostas e Honorários',
+      tagline: 'Crie propostas claras e atrativas',
+      description:
+        'Estruture propostas de honorários éticas e atrativas. Destaque o valor do serviço, organize fases do processo e quebre objeções.',
+      accent: 'var(--balance-flow)',
+      icon: (
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: 'var(--balance-text)' }}
+          aria-hidden="true"
+        >
+          <rect x="4" y="6" width="16" height="12" rx="2" />
+          <path d="M8 10h8" />
+          <path d="M8 14h4" />
+        </svg>
+      ),
+    },
+  ]
+  const loopedProducts = [...products, ...products]
+
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -13,13 +146,10 @@ export default function Home() {
         var(--balance-bg)`
     }}>
       {/* Header fixo */}
-      <header style={{
+      <header className="glass-header" style={{
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        background: 'rgba(244, 245, 246, 0.9)',
-        backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(28, 44, 59, 0.12)',
         padding: '16px 20px'
       }}>
         <div className="container" style={{ 
@@ -29,7 +159,26 @@ export default function Home() {
           gap: '16px'
       }}>
         <Logo size="medium" />
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <Link 
+              href="/agents" 
+              style={{ 
+                padding: '8px 20px',
+                color: 'var(--balance-text)',
+                fontWeight: '600',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(120, 182, 213, 0.12)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent'
+              }}
+            >
+              Agents Jurídicos
+            </Link>
             <Link 
               href="/login" 
               style={{ 
@@ -49,17 +198,14 @@ export default function Home() {
             >
               Entrar
             </Link>
-            <Link 
-              href="/register" 
-              className="btn btn-primary"
-              style={{ 
-                padding: '8px 20px',
-                fontSize: '0.95rem',
-                borderRadius: '999px'
-              }}
-            >
-              Criar Conta
-            </Link>
+            <div className="header-cta-group">
+              <Link href="/agents#agendar-diagnostico" className="btn btn-primary">
+                Agendar diagnóstico
+              </Link>
+              <Link href="/subscription" className="btn btn-secondary">
+                Ver planos
+              </Link>
+            </div>
           </div>
       </div>
       </header>
@@ -94,7 +240,7 @@ export default function Home() {
             letterSpacing: '0.18em',
             color: 'var(--balance-text-light)'
           }}>
-            Tecnologia acessivel
+            Crie o seu próprio agent
           </div>
           <h1 style={{ 
             fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
@@ -115,7 +261,7 @@ export default function Home() {
             fontWeight: '600',
             letterSpacing: '-0.01em'
           }}>
-            Conectamos inteligência, automação e pessoas
+            O seu time entrega mais em menos tempo, com precisão jurídica.
           </p>
           
           <p style={{ 
@@ -126,8 +272,8 @@ export default function Home() {
             margin: '0 auto 3rem',
             lineHeight: '1.7'
           }}>
-            Transforme a forma como sua equipe trabalha. Nossa plataforma de IA e automação 
-            elimina tarefas repetitivas e libera tempo para o que realmente importa.
+            Reduza etapas manuais, agilize respostas e aumente a confiança do cliente. 
+            Nossos agents entregam clareza em contratos, pareceres e comunicação diária.
           </p>
         
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -202,23 +348,25 @@ export default function Home() {
                 background: 'var(--balance-glass-strong)',
                 border: '1px solid var(--balance-glass-border)'
               }}>
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ color: 'var(--balance-text)' }}
-                  aria-hidden="true"
-                >
-                  <path d="M12 2v8" />
-                  <path d="M5 10h14" />
-                  <path d="M7 10v6a5 5 0 0 0 10 0v-6" />
-                  <path d="M4 20h16" />
-                </svg>
+                <Link href="/" aria-label="Ir para a página inicial">
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: 'var(--balance-text)' }}
+                    aria-hidden="true"
+                  >
+                    <path d="M12 2v8" />
+                    <path d="M5 10h14" />
+                    <path d="M7 10v6a5 5 0 0 0 10 0v-6" />
+                    <path d="M4 20h16" />
+                  </svg>
+                </Link>
               </div>
               <h3 style={{ 
                 fontSize: '1.5rem', 
@@ -248,21 +396,23 @@ export default function Home() {
                 background: 'var(--balance-glass-strong)',
                 border: '1px solid var(--balance-glass-border)'
               }}>
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ color: 'var(--balance-text)' }}
-                  aria-hidden="true"
-                >
-                  <path d="M12 3a6 6 0 0 0-3 11v3h6v-3a6 6 0 0 0-3-11Z" />
-                  <path d="M9 20h6" />
-                </svg>
+                <Link href="/" aria-label="Ir para a página inicial">
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: 'var(--balance-text)' }}
+                    aria-hidden="true"
+                  >
+                    <path d="M12 3a6 6 0 0 0-3 11v3h6v-3a6 6 0 0 0-3-11Z" />
+                    <path d="M9 20h6" />
+                  </svg>
+                </Link>
               </div>
               <h3 style={{ 
                 fontSize: '1.5rem', 
@@ -292,20 +442,22 @@ export default function Home() {
                 background: 'var(--balance-glass-strong)',
                 border: '1px solid var(--balance-glass-border)'
               }}>
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ color: 'var(--balance-text)' }}
-                  aria-hidden="true"
-                >
-                  <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
-                </svg>
+                <Link href="/" aria-label="Ir para a página inicial">
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: 'var(--balance-text)' }}
+                    aria-hidden="true"
+                  >
+                    <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
+                  </svg>
+                </Link>
               </div>
               <h3 style={{ 
                 fontSize: '1.5rem', 
@@ -338,7 +490,7 @@ export default function Home() {
               fontSize: 'clamp(2rem, 4vw, 3rem)', 
               marginBottom: '1rem',
               fontWeight: '800',
-              color: 'var(--balance-text)',
+              color: 'var(--balance-flow)',
               fontFamily: 'var(--font-brand)',
               letterSpacing: '-0.02em'
             }}>
@@ -356,433 +508,90 @@ export default function Home() {
           </div>
 
           {/* Carrossel Horizontal */}
-          <div style={{
+          <div className="product-carousel" style={{
             position: 'relative',
             marginTop: '3rem'
           }}>
-            <div style={{
+            <div className="product-track" style={{
               display: 'flex',
               gap: '2rem',
-              overflowX: 'auto',
-              scrollBehavior: 'smooth',
-              padding: '20px 0',
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'var(--balance-primary) var(--balance-bg-light)',
-              WebkitOverflowScrolling: 'touch',
-              msOverflowStyle: '-ms-autohiding-scrollbar'
-            }}
-            onScroll={(e) => {
-              // Adicionar lógica de scroll se necessário
-            }}
-            >
-              {/* Balance Tradutor Juridiquês */}
-              <div className="card" style={{ 
-                minWidth: '380px',
-                maxWidth: '380px',
-                borderTop: '3px solid var(--balance-primary)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                flexShrink: 0
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(28, 44, 59, 0.2)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
-              }}
-              >
-                <div style={{ 
-                  width: '56px',
-                  height: '56px',
-                  margin: '0 auto 1rem',
-                  borderRadius: '18px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: 'var(--balance-glass-strong)',
-                  border: '1px solid var(--balance-glass-border)'
-                }}>
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ color: 'var(--balance-text)' }}
-                    aria-hidden="true"
-                  >
-                    <path d="M12 3v4" />
-                    <path d="M7 7h10" />
-                    <path d="M5 7 3 11h6L7 7Z" />
-                    <path d="M19 7 17 11h6l-2-4Z" />
-                    <path d="M6 17h12" />
-                    <path d="M9 17v2" />
-                    <path d="M15 17v2" />
-                  </svg>
-                </div>
-                <h3 style={{ 
-                  fontSize: '1.5rem', 
-                  marginBottom: '0.75rem',
-                  fontWeight: '700',
-                  color: 'var(--balance-text)',
-                  textAlign: 'center'
-                }}>
-                  Balance Tradutor Juridiquês
-                </h3>
-                <p style={{ 
-                  fontSize: '0.95rem',
-                  marginBottom: '0.5rem',
-                  color: 'var(--balance-primary)',
-                  fontWeight: '600',
-                  textAlign: 'center'
-                }}>
-                  Traduza juridiquês para linguagem simples
-                </p>
-                <p style={{ 
-                  color: 'var(--balance-text-light)',
-                  lineHeight: '1.7',
-                  marginBottom: '1.5rem',
-                  fontSize: '0.95rem'
-                }}>
-                  Transforme textos jurídicos complexos em linguagem clara e acessível. Ideal para contratos, documentos legais e termos técnicos.
-                </p>
-                <Link 
-                  href="/register" 
-                  className="btn btn-primary"
-                  style={{ width: '100%', textAlign: 'center' }}
-                >
-                  Experimentar Agora
-                </Link>
-              </div>
-
-              {/* Balance Checklist Tributário */}
-              <div className="card" style={{ 
-                minWidth: '380px',
-                maxWidth: '380px',
-                borderTop: '3px solid var(--balance-autonomy)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                flexShrink: 0
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(46, 196, 166, 0.2)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
-              }}
-              >
-                <div style={{ 
-                  width: '56px',
-                  height: '56px',
-                  margin: '0 auto 1rem',
-                  borderRadius: '18px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: 'var(--balance-glass-strong)',
-                  border: '1px solid var(--balance-glass-border)'
-                }}>
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ color: 'var(--balance-text)' }}
-                    aria-hidden="true"
-                  >
-                    <path d="M4 7h16v10H4z" />
-                    <path d="m9 12 2 2 4-4" />
-                    <path d="M7 7V5h10v2" />
-                  </svg>
-                </div>
-                <h3 style={{ 
-                  fontSize: '1.5rem', 
-                  marginBottom: '0.75rem',
-                  fontWeight: '700',
-                  color: 'var(--balance-text)',
-                  textAlign: 'center'
-                }}>
-                  Balance Checklist Tributário
-                </h3>
-                <p style={{ 
-                  fontSize: '0.95rem',
-                  marginBottom: '0.5rem',
-                  color: 'var(--balance-autonomy)',
-                  fontWeight: '600',
-                  textAlign: 'center'
-                }}>
-                  Checklists completos para serviços tributários
-                </p>
-                <p style={{ 
-                  color: 'var(--balance-text-light)',
-                  lineHeight: '1.7',
-                  marginBottom: '1.5rem',
-                  fontSize: '0.95rem'
-                }}>
-                  Gere checklists claros e completos de documentos fiscais e contábeis. Agilize a coleta documental e fortaleça a percepção de valor.
-                </p>
-                <Link 
-                  href="/register" 
-                  className="btn btn-primary"
-                  style={{ width: '100%', textAlign: 'center' }}
-                >
-                  Experimentar Agora
-                </Link>
-              </div>
-
-              {/* Balance Criador de Conteúdo Jurídico Ético */}
-              <div className="card" style={{ 
-                minWidth: '380px',
-                maxWidth: '380px',
-                borderTop: '3px solid var(--balance-flow)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                flexShrink: 0
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(120, 182, 213, 0.2)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
-              }}
-              >
-                <div style={{ 
-                  width: '56px',
-                  height: '56px',
-                  margin: '0 auto 1rem',
-                  borderRadius: '18px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: 'var(--balance-glass-strong)',
-                  border: '1px solid var(--balance-glass-border)'
-                }}>
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ color: 'var(--balance-text)' }}
-                    aria-hidden="true"
-                  >
-                    <rect x="7" y="3" width="10" height="18" rx="2" />
-                    <path d="M11 7h2" />
-                    <path d="M10 17h4" />
-                  </svg>
-                </div>
-                <h3 style={{ 
-                  fontSize: '1.5rem', 
-                  marginBottom: '0.75rem',
-                  fontWeight: '700',
-                  color: 'var(--balance-text)',
-                  textAlign: 'center'
-                }}>
-                  Balance Criador de Conteúdo Jurídico Ético
-                </h3>
-                <p style={{ 
-                  fontSize: '0.95rem',
-                  marginBottom: '0.5rem',
-                  color: 'var(--balance-flow)',
-                  fontWeight: '600',
-                  textAlign: 'center'
-                }}>
-                  Crie conteúdo ético para redes sociais
-                </p>
-                <p style={{ 
-                  color: 'var(--balance-text-light)',
-                  lineHeight: '1.7',
-                  marginBottom: '1.5rem',
-                  fontSize: '0.95rem'
-                }}>
-                  Gere ideias criativas, roteiros e legendas para posts jurídicos em redes sociais. Conteúdo ético, educativo e engajador.
-                </p>
-                <Link 
-                  href="/register" 
-                  className="btn btn-primary"
-                  style={{ width: '100%', textAlign: 'center' }}
-                >
-                  Experimentar Agora
-                </Link>
-              </div>
-
-              {/* Balance Comercial Quebra de Objeções com PNL */}
-              <div className="card" style={{ 
-                minWidth: '380px',
-                maxWidth: '380px',
-                borderTop: '3px solid var(--balance-secondary)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                flexShrink: 0
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(92, 103, 112, 0.2)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
-              }}
-              >
-                <div style={{ 
-                  width: '56px',
-                  height: '56px',
-                  margin: '0 auto 1rem',
-                  borderRadius: '18px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: 'var(--balance-glass-strong)',
-                  border: '1px solid var(--balance-glass-border)'
-                }}>
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ color: 'var(--balance-text)' }}
-                    aria-hidden="true"
-                  >
-                    <path d="M4 6h16v9H8l-4 3z" />
-                    <path d="M8 10h8" />
-                    <path d="M8 13h5" />
-                  </svg>
-                </div>
-                <h3 style={{ 
-                  fontSize: '1.5rem', 
-                  marginBottom: '0.75rem',
-                  fontWeight: '700',
-                  color: 'var(--balance-text)',
-                  textAlign: 'center'
-                }}>
-                  Balance Comercial Quebra de Objeções com PNL
-                </h3>
-                <p style={{ 
-                  fontSize: '0.95rem',
-                  marginBottom: '0.5rem',
-                  color: 'var(--balance-secondary)',
-                  fontWeight: '600',
-                  textAlign: 'center'
-                }}>
-                  Quebre objeções e feche mais contratos
-                </p>
-                <p style={{ 
-                  color: 'var(--balance-text-light)',
-                  lineHeight: '1.7',
-                  marginBottom: '1.5rem',
-                  fontSize: '0.95rem'
-                }}>
-                  Aprenda a responder objeções comerciais com técnicas de PNL e persuasão. Transforme resistências em oportunidades de fechamento.
-                </p>
-                <Link 
-                  href="/register" 
-                  className="btn btn-primary"
-                  style={{ width: '100%', textAlign: 'center' }}
-                >
-                  Experimentar Agora
-                </Link>
-              </div>
-
-              {/* Balance Organizador – Propostas e Honorários */}
-              <div className="card" style={{ 
-                minWidth: '380px',
-                maxWidth: '380px',
-                borderTop: '3px solid var(--balance-primary)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                flexShrink: 0
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)'
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(28, 44, 59, 0.2)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 20px 45px var(--balance-glass-shadow)'
-              }}
-              >
-                <div style={{ 
-                  width: '56px',
-                  height: '56px',
-                  margin: '0 auto 1rem',
-                  borderRadius: '18px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: 'var(--balance-glass-strong)',
-                  border: '1px solid var(--balance-glass-border)'
-                }}>
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ color: 'var(--balance-text)' }}
-                    aria-hidden="true"
-                  >
-                    <rect x="4" y="6" width="16" height="12" rx="2" />
-                    <path d="M8 10h8" />
-                    <path d="M8 14h4" />
-                  </svg>
-                </div>
-                <h3 style={{ 
-                  fontSize: '1.5rem', 
-                  marginBottom: '0.75rem',
-                  fontWeight: '700',
-                  color: 'var(--balance-text)',
-                  textAlign: 'center'
-                }}>
-                  Balance Organizador – Propostas e Honorários
-                </h3>
-                <p style={{ 
-                  fontSize: '0.95rem',
-                  marginBottom: '0.5rem',
-                  color: 'var(--balance-primary)',
-                  fontWeight: '600',
-                  textAlign: 'center'
-                }}>
-                  Crie propostas claras e atrativas
-                </p>
-                <p style={{ 
-                  color: 'var(--balance-text-light)',
-                  lineHeight: '1.7',
-                  marginBottom: '1.5rem',
-                  fontSize: '0.95rem'
-                }}>
-                  Estruture propostas de honorários éticas e atrativas. Destaque o valor do serviço, organize fases do processo e quebre objeções.
-                </p>
-                <Link 
-                  href="/register" 
-                  className="btn btn-primary"
-                  style={{ width: '100%', textAlign: 'center' }}
-                >
-                  Experimentar Agora
-                </Link>
-              </div>
-            </div>
-
-            {/* Indicador de scroll */}
-            <div style={{
-              textAlign: 'center',
-              marginTop: '2rem',
-              color: 'var(--balance-text-light)',
-              fontSize: '0.9rem'
+              padding: '20px 0'
             }}>
-              ← Role para ver todos os produtos →
+              {loopedProducts.map((product, index) => (
+                <div
+                  className="card"
+                  key={`${product.title}-${index}`}
+                  style={{
+                    minWidth: '380px',
+                    maxWidth: '380px',
+                    borderTopWidth: '3px',
+                    borderTopStyle: 'solid',
+                    borderTopColor: 'var(--balance-primary)',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    flexShrink: 0,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)'
+                    e.currentTarget.style.boxShadow =
+                      '0 20px 40px rgba(28, 44, 59, 0.2)'
+                    e.currentTarget.style.borderTopColor = 'var(--balance-flow)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow =
+                      '0 20px 45px var(--balance-glass-shadow)'
+                    e.currentTarget.style.borderTopColor = 'var(--balance-primary)'
+                  }}
+                >
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    margin: '0 auto 1rem',
+                    borderRadius: '18px',
+                    display: 'grid',
+                    placeItems: 'center',
+                    background: 'var(--balance-glass-strong)',
+                    border: '1px solid var(--balance-glass-border)',
+                  }}>
+                    <Link href="/" aria-label="Ir para a página inicial">
+                      {product.icon}
+                    </Link>
+                  </div>
+                  <h3 style={{
+                    fontSize: '1.5rem',
+                    marginBottom: '0.75rem',
+                    fontWeight: '700',
+                    color: 'var(--balance-text)',
+                    textAlign: 'center',
+                  }}>
+                    {product.title}
+                  </h3>
+                  <p style={{
+                    fontSize: '0.95rem',
+                    marginBottom: '0.5rem',
+                    color: product.accent,
+                    fontWeight: '600',
+                    textAlign: 'center',
+                  }}>
+                    {product.tagline}
+                  </p>
+                  <p style={{
+                    color: 'var(--balance-text-light)',
+                    lineHeight: '1.7',
+                    marginBottom: '1.5rem',
+                    fontSize: '0.95rem',
+                  }}>
+                    {product.description}
+                  </p>
+                  <Link
+                    href="/register"
+                    className="btn btn-primary"
+                    style={{ width: '100%', textAlign: 'center' }}
+                  >
+                    Experimentar Agora
+                  </Link>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -918,7 +727,8 @@ export default function Home() {
             marginBottom: '1.5rem',
             fontWeight: '800',
             fontFamily: 'var(--font-brand)',
-            letterSpacing: '-0.02em'
+            letterSpacing: '-0.02em',
+            color: '#efefef'
           }}>
             Pronto para transformar seu trabalho?
           </h2>

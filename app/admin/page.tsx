@@ -1,159 +1,269 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '../../components/Logo'
 
-interface AdminUser {
-  id: string
-  name: string
-  email: string
-  role: string
-  createdAt: string
-  subscription: {
+interface Stats {
+  overview: {
+    totalUsers: number
+    usersLast30d: number
+    usersLast7d: number
+    totalSubscriptions: number
+    activeSubscriptions: number
+    cancelledSubscriptions: number
+    pendingSubscriptions: number
+    totalConversations: number
+    conversationsLast7d: number
+    totalMessages: number
+  }
+  subscriptionsByPlan: { plan: string; count: number }[]
+  usersByProvider: { provider: string; count: number }[]
+  recentUsers: {
+    id: string
+    name: string
+    email: string
+    provider: string | null
+    createdAt: string
+    subscription: { plan: string; status: string } | null
+  }[]
+  recentSubscriptions: {
+    id: string
     plan: string
     status: string
+    createdAt: string
+    startDate: string
     endDate: string | null
-  } | null
+    user: { name: string; email: string }
+  }[]
 }
 
-export default function AdminPage() {
-  const router = useRouter()
+const planNames: Record<string, string> = {
+  monthly: 'Essentials',
+  yearly: 'Operations',
+  free: 'Free',
+}
+
+const statusColors: Record<string, string> = {
+  active: '#2ec4a6',
+  cancelled: '#e74c3c',
+  expired: '#f39c12',
+  pending: '#8899a6',
+}
+
+function StatCard({ label, value, sub, accent }: { label: string; value: string | number; sub?: string; accent?: boolean }) {
+  return (
+    <div style={{
+      background: '#192734',
+      borderRadius: '14px',
+      padding: '20px',
+      border: accent ? '1px solid rgba(120, 182, 213, 0.3)' : '1px solid rgba(255,255,255,0.06)',
+    }}>
+      <p style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.68rem',
+        textTransform: 'uppercase',
+        letterSpacing: '0.14em',
+        color: '#8899a6',
+        marginBottom: '8px',
+      }}>
+        {label}
+      </p>
+      <p style={{
+        fontSize: '2rem',
+        fontWeight: '800',
+        color: accent ? '#78b6d5' : '#e7e9ea',
+        fontFamily: 'var(--font-brand)',
+        lineHeight: 1,
+      }}>
+        {value}
+      </p>
+      {sub && (
+        <p style={{ fontSize: '0.8rem', color: '#8899a6', marginTop: '6px' }}>{sub}</p>
+      )}
+    </div>
+  )
+}
+
+export default function AdminDashboard() {
+  const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
-  const [users, setUsers] = useState<AdminUser[]>([])
-  const [error, setError] = useState('')
 
   useEffect(() => {
-    loadAdminData()
+    const load = async () => {
+      try {
+        const res = await fetch('/api/admin/stats')
+        if (res.ok) {
+          setStats(await res.json())
+        }
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [])
 
-  const loadAdminData = async () => {
-    try {
-      const meResponse = await fetch('/api/auth/me')
-      if (!meResponse.ok) {
-        router.push('/login')
-        return
-      }
-
-      const meData = await meResponse.json()
-      if (meData.user?.role !== 'admin') {
-        router.push('/dashboard')
-        return
-      }
-
-      const response = await fetch('/api/admin/users')
-      const data = await response.json()
-      if (!response.ok) {
-        setError(data.error || 'Erro ao carregar usuários')
-        return
-      }
-
-      setUsers(data.users || [])
-    } catch (err) {
-      setError('Erro ao carregar painel')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--balance-bg)' }}>
-        <p style={{ color: 'var(--balance-text-light)' }}>Carregando...</p>
-      </div>
-    )
+    return <p style={{ color: '#8899a6' }}>Carregando estatísticas...</p>
   }
+
+  if (!stats) {
+    return <p style={{ color: '#e74c3c' }}>Erro ao carregar estatísticas.</p>
+  }
+
+  const o = stats.overview
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--balance-bg)' }}>
-      <header style={{
-        background: 'white',
-        borderBottom: '1px solid var(--balance-border)',
-        padding: '16px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <Logo size="medium" />
-        <Link
-          href="/dashboard"
-          style={{
-            padding: '8px 20px',
-            color: 'var(--balance-text)',
-            fontWeight: '600',
-            textDecoration: 'none',
-            borderRadius: '8px',
-            transition: 'all 0.3s ease'
-          }}
-        >
-          Voltar ao Dashboard
-        </Link>
-      </header>
+    <div>
+      <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#e7e9ea', fontFamily: 'var(--font-brand)', marginBottom: '24px' }}>
+        Visão geral
+      </h1>
 
-      <div className="container" style={{ padding: '40px 20px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '1rem', color: 'var(--balance-text)' }}>
-          Administração
-        </h1>
+      {/* KPI Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '32px' }}>
+        <StatCard label="Total de usuários" value={o.totalUsers} sub={`+${o.usersLast7d} nos últimos 7 dias`} accent />
+        <StatCard label="Assinaturas ativas" value={o.activeSubscriptions} sub={`${o.cancelledSubscriptions} canceladas`} accent />
+        <StatCard label="Conversas" value={o.totalConversations} sub={`+${o.conversationsLast7d} últimos 7 dias`} />
+        <StatCard label="Mensagens" value={o.totalMessages} />
+        <StatCard label="Cadastros (30 dias)" value={o.usersLast30d} />
+      </div>
 
-        {error && (
-          <div style={{
-            background: '#fee2e2',
-            color: '#991b1b',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            marginBottom: '16px'
-          }}>
-            {error}
+      {/* Two-column details */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+        {/* Assinaturas por plano */}
+        <div style={{ background: '#192734', borderRadius: '14px', padding: '20px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#e7e9ea', marginBottom: '14px' }}>
+            Assinaturas ativas por plano
+          </h3>
+          {stats.subscriptionsByPlan.length === 0 ? (
+            <p style={{ color: '#8899a6', fontSize: '0.9rem' }}>Nenhuma assinatura ativa</p>
+          ) : (
+            <div style={{ display: 'grid', gap: '8px' }}>
+              {stats.subscriptionsByPlan.map((s) => (
+                <div key={s.plan} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)' }}>
+                  <span style={{ color: '#e7e9ea', fontSize: '0.9rem', fontWeight: '600' }}>{planNames[s.plan] || s.plan}</span>
+                  <span style={{ color: '#78b6d5', fontWeight: '700', fontSize: '1.1rem' }}>{s.count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Usuários por provedor */}
+        <div style={{ background: '#192734', borderRadius: '14px', padding: '20px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#e7e9ea', marginBottom: '14px' }}>
+            Cadastros por canal
+          </h3>
+          <div style={{ display: 'grid', gap: '8px' }}>
+            {stats.usersByProvider.map((u) => (
+              <div key={u.provider} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)' }}>
+                <span style={{ color: '#e7e9ea', fontSize: '0.9rem', fontWeight: '600', textTransform: 'capitalize' }}>{u.provider}</span>
+                <span style={{ color: '#78b6d5', fontWeight: '700', fontSize: '1.1rem' }}>{u.count}</span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      </div>
 
-        <div style={{
-          background: 'white',
-          border: '1px solid var(--balance-border)',
-          borderRadius: '12px',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            padding: '16px 20px',
-            borderBottom: '1px solid var(--balance-border)',
-            fontWeight: '700',
-            color: 'var(--balance-text)'
-          }}>
-            Usuários ({users.length})
-          </div>
-
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: 'var(--balance-bg-light)' }}>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', fontSize: '0.85rem' }}>Nome</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', fontSize: '0.85rem' }}>Email</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', fontSize: '0.85rem' }}>Role</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', fontSize: '0.85rem' }}>Assinatura</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', fontSize: '0.85rem' }}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id} style={{ borderBottom: '1px solid var(--balance-border)' }}>
-                    <td style={{ padding: '12px 16px' }}>{user.name}</td>
-                    <td style={{ padding: '12px 16px' }}>{user.email}</td>
-                    <td style={{ padding: '12px 16px' }}>{user.role}</td>
-                    <td style={{ padding: '12px 16px' }}>{user.subscription?.plan || '-'}</td>
-                    <td style={{ padding: '12px 16px' }}>{user.subscription?.status || '-'}</td>
-                  </tr>
+      {/* Recent Users Table */}
+      <div style={{ background: '#192734', borderRadius: '14px', padding: '20px', border: '1px solid rgba(255,255,255,0.06)', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#e7e9ea' }}>Últimos cadastros</h3>
+          <Link href="/admin/users" style={{ fontSize: '0.82rem', color: '#78b6d5', textDecoration: 'none', fontWeight: '600' }}>
+            Ver todos →
+          </Link>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Nome', 'E-mail', 'Canal', 'Plano', 'Data'].map((h) => (
+                  <th key={h} style={{ textAlign: 'left', padding: '8px 10px', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#8899a6', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    {h}
+                  </th>
                 ))}
-                {users.length === 0 && (
-                  <tr>
-                    <td colSpan={5} style={{ padding: '16px', color: 'var(--balance-text-light)' }}>
-                      Nenhum usuário encontrado.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.recentUsers.map((u) => (
+                <tr key={u.id}>
+                  <td style={{ padding: '10px', fontSize: '0.9rem', color: '#e7e9ea', fontWeight: '600', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <Link href={`/admin/users?highlight=${u.id}`} style={{ color: '#e7e9ea', textDecoration: 'none' }}>{u.name}</Link>
+                  </td>
+                  <td style={{ padding: '10px', fontSize: '0.85rem', color: '#8899a6', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>{u.email}</td>
+                  <td style={{ padding: '10px', fontSize: '0.85rem', color: '#8899a6', borderBottom: '1px solid rgba(255,255,255,0.04)', textTransform: 'capitalize' }}>{u.provider || 'email'}</td>
+                  <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    {u.subscription ? (
+                      <span style={{ fontSize: '0.78rem', padding: '3px 10px', borderRadius: '999px', background: 'rgba(46, 196, 166, 0.15)', color: '#2ec4a6', fontWeight: '600' }}>
+                        {planNames[u.subscription.plan] || u.subscription.plan}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: '0.78rem', color: '#8899a6' }}>—</span>
+                    )}
+                  </td>
+                  <td style={{ padding: '10px', fontSize: '0.82rem', color: '#8899a6', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    {new Date(u.createdAt).toLocaleDateString('pt-BR')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Recent Subscriptions Table */}
+      <div style={{ background: '#192734', borderRadius: '14px', padding: '20px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#e7e9ea' }}>Últimas assinaturas</h3>
+          <Link href="/admin/subscriptions" style={{ fontSize: '0.82rem', color: '#78b6d5', textDecoration: 'none', fontWeight: '600' }}>
+            Ver todas →
+          </Link>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Usuário', 'Plano', 'Status', 'Início', 'Fim'].map((h) => (
+                  <th key={h} style={{ textAlign: 'left', padding: '8px 10px', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#8899a6', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {stats.recentSubscriptions.map((s) => (
+                <tr key={s.id}>
+                  <td style={{ padding: '10px', fontSize: '0.9rem', color: '#e7e9ea', fontWeight: '600', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    {s.user.name}
+                    <br />
+                    <span style={{ fontSize: '0.78rem', color: '#8899a6', fontWeight: '400' }}>{s.user.email}</span>
+                  </td>
+                  <td style={{ padding: '10px', fontSize: '0.88rem', color: '#e7e9ea', borderBottom: '1px solid rgba(255,255,255,0.04)', fontWeight: '600' }}>
+                    {planNames[s.plan] || s.plan}
+                  </td>
+                  <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <span style={{
+                      fontSize: '0.78rem',
+                      padding: '3px 10px',
+                      borderRadius: '999px',
+                      background: `${statusColors[s.status] || '#8899a6'}20`,
+                      color: statusColors[s.status] || '#8899a6',
+                      fontWeight: '600',
+                    }}>
+                      {s.status}
+                    </span>
+                  </td>
+                  <td style={{ padding: '10px', fontSize: '0.82rem', color: '#8899a6', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    {new Date(s.startDate).toLocaleDateString('pt-BR')}
+                  </td>
+                  <td style={{ padding: '10px', fontSize: '0.82rem', color: '#8899a6', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    {s.endDate ? new Date(s.endDate).toLocaleDateString('pt-BR') : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
