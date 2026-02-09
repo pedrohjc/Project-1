@@ -11,13 +11,13 @@ export async function verifyPassword(password: string, hashedPassword: string): 
   return bcrypt.compare(password, hashedPassword)
 }
 
-export function generateToken(userId: string): string {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' })
+export function generateToken(userId: string, role: string): string {
+  return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '7d' })
 }
 
-export function verifyToken(token: string): { userId: string } | null {
+export function verifyToken(token: string): { userId: string; role?: string } | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role?: string }
     return decoded
   } catch {
     return null

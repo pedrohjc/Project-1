@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hashPassword, generateToken } from '@/lib/auth'
+import { isAdminEmail } from '@/lib/admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,16 +28,18 @@ export async function POST(request: NextRequest) {
 
     // Criar usuário
     const hashedPassword = await hashPassword(password)
+    const role = isAdminEmail(email) ? 'admin' : 'user'
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
+        role,
       },
     })
 
     // Gerar token
-    const token = generateToken(user.id)
+    const token = generateToken(user.id, user.role)
 
     // Criar resposta com cookie
     const response = NextResponse.json({
@@ -45,6 +48,7 @@ export async function POST(request: NextRequest) {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     })
 

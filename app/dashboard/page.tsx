@@ -12,6 +12,7 @@ interface User {
   id: string
   name: string
   email: string
+  role?: string
 }
 
 interface Product {
@@ -73,12 +74,19 @@ export default function DashboardPage() {
     lastConversationTitle: string
   }>>([])
   const [pendingReviewCount, setPendingReviewCount] = useState(0)
-  const [tokensUsed, setTokensUsed] = useState(15) // Valor de teste - remover depois
-  const monthlyTokenLimit = 50
-  const tokensResetLabel = 'hoje'
+  const [tokensUsed, setTokensUsed] = useState(0)
+  const [tokenLimit, setTokenLimit] = useState(0)
+  const [extraTokens, setExtraTokens] = useState(0)
+  const [tokensResetLabel, setTokensResetLabel] = useState('—')
+  const [hasSubscription, setHasSubscription] = useState(false)
+  const [tokenToast, setTokenToast] = useState('')
+  const [tokenToastType, setTokenToastType] = useState<'tokens' | 'subscription' | ''>('')
+  const tokenToastTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     checkAuth()
+    loadTokenStatus()
+    loadSubscriptionStatus()
   }, [])
 
   useEffect(() => {
@@ -123,6 +131,7 @@ export default function DashboardPage() {
       }
       const data = await response.json()
       setUser(data.user)
+      setTokenToast('')
       // Preencher formulário de perfil com dados do usuário
       setProfileForm({
         name: data.user.name || '',
@@ -136,6 +145,48 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadTokenStatus = async () => {
+    try {
+      const response = await fetch('/api/tokens/status')
+      if (!response.ok) return
+      const data = await response.json()
+      setTokensUsed(data.tokensUsed || 0)
+      setTokenLimit(data.tokenLimit || 0)
+      setExtraTokens(data.extraTokens || 0)
+      setTokenToast('')
+      if (data.resetLabel) {
+        setTokensResetLabel(data.resetLabel)
+      } else if (data.resetAt) {
+        setTokensResetLabel(new Date(data.resetAt).toLocaleDateString('pt-BR'))
+      }
+    } catch {
+      // Silencioso: não bloqueia o uso
+    }
+  }
+
+  const loadSubscriptionStatus = async () => {
+    try {
+      const response = await fetch('/api/subscriptions/status')
+      if (!response.ok) return
+      const data = await response.json()
+      setHasSubscription(Boolean(data?.hasSubscription))
+    } catch {
+      // Silencioso: não bloqueia o uso
+    }
+  }
+
+  const showTokenToast = (message: string, type: 'tokens' | 'subscription' = 'tokens') => {
+    setTokenToast(message)
+    setTokenToastType(type)
+    if (tokenToastTimerRef.current) {
+      window.clearTimeout(tokenToastTimerRef.current)
+    }
+    tokenToastTimerRef.current = window.setTimeout(() => {
+      setTokenToast('')
+      setTokenToastType('')
+    }, 5000)
   }
 
   const handleOpenProfile = async () => {
@@ -392,8 +443,8 @@ export default function DashboardPage() {
     if ((!input.trim() && selectedFiles.length === 0) || processing || !selectedProduct) return
 
     // Verificar limite de tokens
-    if (tokensUsed >= monthlyTokenLimit) {
-      alert('Você atingiu o limite de créditos de IA deste mês. Aguarde o reset ou entre em contato para obter mais créditos.')
+    if (tokenLimit + extraTokens > 0 && tokensUsed >= tokenLimit + extraTokens) {
+      showTokenToast('Você atingiu o limite de créditos de IA deste mês. Aguarde o reset ou entre em contato para obter mais créditos.', 'tokens')
       return
     }
 
@@ -460,24 +511,39 @@ export default function DashboardPage() {
         
         // Definir conversa ativa
         setActiveConversationId(data.conversation.id)
-        // Incrementar contador de tokens (1 token por mensagem enviada)
-        setTokensUsed(prev => prev + 1)
+        // Atualizar contador de tokens com dados do backend
+        if (typeof data.tokensUsed === 'number') {
+          setTokensUsed(data.tokensUsed)
+        }
+        if (typeof data.tokenLimit === 'number') {
+          setTokenLimit(data.tokenLimit)
+        }
+        if (typeof data.extraTokens === 'number') {
+          setExtraTokens(data.extraTokens)
+        }
+        if (data.resetAt) {
+          setTokensResetLabel(new Date(data.resetAt).toLocaleDateString('pt-BR'))
+        }
+        setTokenToast('')
+        setTokenToastType('')
         // Limpar arquivos após envio bem-sucedido
         setSelectedFiles([])
         const fileInput = document.getElementById('file-input') as HTMLInputElement
         if (fileInput) fileInput.value = ''
       } else {
-        // TODO: REATIVAR EM PRODUÇÃO - Verificação de assinatura desabilitada para desenvolvimento
-        // Verificar se é erro de assinatura
-        // if (data.requiresSubscription) {
-        //   if (confirm(`${data.message || 'Você precisa de uma assinatura ativa para usar os produtos.'}\n\nDeseja ir para a página de assinaturas?`)) {
-        //     router.push('/subscription')
-        //   }
-        // } else {
-        //   Mostrar mensagem de erro mais amigável
+        if (data.requiresSubscription) {
+          const message =
+            data.message || 'Você precisa de uma assinatura ativa para usar os produtos.'
+          showTokenToast(message, 'subscription')
+          return
+        }
+
         const errorMessage = data.error || 'Erro ao processar. Tente novamente.'
-        alert(errorMessage)
-        // }
+        if (response.status === 403 && (data.tokenLimit || errorMessage.toLowerCase().includes('token'))) {
+          showTokenToast(errorMessage, 'tokens')
+        } else {
+          alert(errorMessage)
+        }
       }
     } catch (err) {
       alert('Erro ao processar. Tente novamente.')
@@ -797,7 +863,10 @@ export default function DashboardPage() {
   const renderRecentProductsSidebar = () => {
     const recentItems = recentProducts.filter(({ product }) => product.id !== selectedProduct?.id)
 
-    const usagePercentage = Math.round((tokensUsed / monthlyTokenLimit) * 100)
+    const totalAvailable = tokenLimit + extraTokens
+    const usagePercentage = totalAvailable > 0
+      ? Math.round((tokensUsed / totalAvailable) * 100)
+      : 0
     
     return (
       <div style={{
@@ -959,9 +1028,15 @@ export default function DashboardPage() {
                 {tokensUsed.toLocaleString()}
               </span>
               {' / '}
-              <span>{monthlyTokenLimit.toLocaleString()}</span>
+              <span>{totalAvailable.toLocaleString()}</span>
               {' usados este mês'}
             </div>
+            {extraTokens > 0 && (
+              <div style={{ fontSize: '0.75rem', color: 'var(--balance-text-light)', marginBottom: '8px' }}>
+                Inclui {extraTokens.toLocaleString()} tokens extras
+              </div>
+            )}
+
             
             {/* Progress Bar */}
             <div style={{
@@ -996,6 +1071,28 @@ export default function DashboardPage() {
               <span>{usagePercentage}% utilizado</span>
               <span>Reset: {tokensResetLabel}</span>
             </div>
+            {totalAvailable > 0 && (totalAvailable - tokensUsed) / totalAvailable < 0.3 && (
+              <button
+                onClick={() => {
+                  router.push('/tokens')
+                  window.location.href = '/tokens'
+                }}
+                style={{
+                  marginTop: '10px',
+                  width: '100%',
+                  padding: '8px 10px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--balance-border)',
+                  background: 'white',
+                  color: 'var(--balance-text)',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Adicionar tokens
+              </button>
+            )}
           </div>
           
           {/* User Profile */}
@@ -1089,7 +1186,7 @@ export default function DashboardPage() {
                   👤 Meu Perfil
                 </button>
                 <Link
-                  href="/subscription"
+                  href={hasSubscription ? '/tokens' : '/subscription'}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -1100,11 +1197,36 @@ export default function DashboardPage() {
                     transition: 'background 0.2s',
                     fontSize: '0.9rem'
                   }}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const target = hasSubscription ? '/tokens' : '/subscription'
+                    router.push(target)
+                    window.location.href = target
+                  }}
                   onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                 >
                   💳 Minha Assinatura
                 </Link>
+                {user?.role === 'admin' && (
+                  <Link
+                    href="/admin"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '12px 16px',
+                      color: 'var(--balance-text)',
+                      textDecoration: 'none',
+                      transition: 'background 0.2s',
+                      fontSize: '0.9rem'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--balance-bg-light)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                  >
+                    🛠️ Admin
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   style={{
@@ -1206,6 +1328,62 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--balance-bg-light)', display: 'flex', flexDirection: 'column' }}>
+      {tokenToast && (
+        <div style={{
+          position: 'fixed',
+          right: '24px',
+          bottom: '24px',
+          background: '#111827',
+          color: 'white',
+          padding: '12px 16px',
+          borderRadius: '10px',
+          fontSize: '0.9rem',
+          boxShadow: '0 10px 20px rgba(0,0,0,0.25)',
+          zIndex: 9999,
+          maxWidth: '320px'
+        }}>
+          <div style={{ marginBottom: '10px' }}>{tokenToast}</div>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => {
+                setTokenToast('')
+                setTokenToastType('')
+              }}
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.3)',
+                color: 'white',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.8rem'
+              }}
+            >
+              Ficar
+            </button>
+            <button
+              onClick={() => {
+                setTokenToast('')
+                setTokenToastType('')
+                router.push('/tokens')
+                window.location.href = '/tokens'
+              }}
+              style={{
+                background: '#22c55e',
+                border: 'none',
+                color: 'white',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: 600
+              }}
+            >
+              Adicionar Tokens
+            </button>
+          </div>
+        </div>
+      )}
       {/* Header - só aparece quando um produto está selecionado */}
       {selectedProduct && (
         <header style={{ 

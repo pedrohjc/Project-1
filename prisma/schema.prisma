@@ -15,10 +15,14 @@ model User {
   email         String         @unique
   password      String
   name          String
+  role          String         @default("user")
+  extraTokens   Int            @default(0)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   conversations Conversation[]
   subscription Subscription?
+  tokenUsages   TokenUsage[]
+  tokenTopUps   TokenTopUp[]
 }
 
 model Conversation {
@@ -55,4 +59,30 @@ model Subscription {
   cancelledAt       DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model TokenUsage {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  periodStart DateTime
+  periodEnd   DateTime
+  usedTokens  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, periodStart])
+}
+
+model TokenTopUp {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokens        Int
+  amount        Float
+  status        String   // 'pending', 'approved', 'rejected'
+  mercadoPagoId String?
+  paymentId     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

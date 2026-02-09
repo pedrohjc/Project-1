@@ -31,6 +31,54 @@ export async function POST(request: NextRequest) {
       const externalReference = paymentData.external_reference
       const metadata = paymentData.metadata as any
 
+      if (metadata?.type === 'token_topup') {
+        const topUpId = metadata?.topUpId || externalReference
+        if (!topUpId) {
+          return NextResponse.json({ received: true })
+        }
+
+        const topUp = await prisma.tokenTopUp.findUnique({
+          where: { id: topUpId }
+        })
+
+        if (!topUp) {
+          console.error('Top-up não encontrado para pagamento:', paymentId)
+          return NextResponse.json({ received: true })
+        }
+
+        const paymentStatus = paymentData.status
+
+        if (paymentStatus === 'approved') {
+          await prisma.$transaction([
+            prisma.tokenTopUp.update({
+              where: { id: topUp.id },
+              data: {
+                status: 'approved',
+                paymentId: paymentId.toString(),
+              }
+            }),
+            prisma.user.update({
+              where: { id: topUp.userId },
+              data: {
+                extraTokens: { increment: topUp.tokens }
+              }
+            })
+          ])
+        } else if (paymentStatus === 'rejected' || paymentStatus === 'cancelled') {
+          await prisma.tokenTopUp.update({
+            where: { id: topUp.id },
+            data: { status: 'rejected' }
+          })
+        } else if (paymentStatus === 'pending') {
+          await prisma.tokenTopUp.update({
+            where: { id: topUp.id },
+            data: { status: 'pending' }
+          })
+        }
+
+        return NextResponse.json({ received: true })
+      }
+
       let subscription
 
       if (externalReference) {

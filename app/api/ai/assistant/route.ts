@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserIdFromRequest } from '@/lib/middleware'
 import { checkUserSubscription } from '@/lib/subscription'
+import { estimateTokensFromFiles, estimateTokensFromText, getTokenLimit, getTokenPeriod } from '@/lib/tokens'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
@@ -845,19 +846,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    // TODO: REATIVAR EM PRODUÇÃO - Verificação de assinatura desabilitada para desenvolvimento
     // Verificar se o usuário tem assinatura ativa
-    // const { hasActiveSubscription } = await checkUserSubscription(userId)
-    // if (!hasActiveSubscription) {
-    //   return NextResponse.json(
-    //     { 
-    //       error: 'Assinatura necessária',
-    //       message: 'Você precisa de uma assinatura ativa para usar os produtos. Acesse /subscription para assinar.',
-    //       requiresSubscription: true
-    //     },
-    //     { status: 403 }
-    //   )
-    // }
+    const { hasActiveSubscription, subscription } = await checkUserSubscription(userId)
+    if (!hasActiveSubscription || !subscription) {
+      return NextResponse.json(
+        {
+          error: 'Assinatura necessária',
+          message: 'Você precisa de uma assinatura ativa para usar os produtos. Acesse /subscription para assinar.',
+          requiresSubscription: true
+        },
+        { status: 403 }
+      )
+    }
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
@@ -913,7 +913,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Usar Gemini para processar
-    return handleGemini(userId, productId, conversationId, message, config, files)
+    return handleGemini(userId, productId, conversationId, message, config, files, subscription.plan)
   } catch (error: any) {
     console.error('Erro ao processar:', error)
     return NextResponse.json(
@@ -929,7 +929,8 @@ async function handleGemini(
   conversationId: string | null,
   message: string,
   config: { model: string, systemInstruction: string },
-  files: File[] = []
+  files: File[] = [],
+  plan: string
 ) {
   let conversation: any
 
@@ -970,8 +971,66 @@ async function handleGemini(
     })
   }
 
+  // Calcular uso estimado de tokens antes de chamar o modelo
+  const recentMessages = conversation.messages
+    .filter((msg: any) => msg.role !== 'system')
+    .slice(-10)
+
+  const historyTokens = recentMessages.reduce(
+    (sum: number, msg: any) => sum + estimateTokensFromText(msg.content),
+    0
+  )
+
+  const estimatedPromptTokens =
+    estimateTokensFromText(message) +
+    estimateTokensFromText(config.systemInstruction) +
+    historyTokens +
+    estimateTokensFromFiles(files)
+
+  const { periodStart, periodEnd } = getTokenPeriod(new Date())
+  const tokenLimit = getTokenLimit(plan)
+
+  const [tokenUsage, user] = await Promise.all([
+    prisma.tokenUsage.upsert({
+      where: {
+        userId_periodStart: {
+          userId,
+          periodStart,
+        }
+      },
+      create: {
+        userId,
+        periodStart,
+        periodEnd,
+        usedTokens: 0
+      },
+      update: {}
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { extraTokens: true }
+    })
+  ])
+
+  const extraTokens = user?.extraTokens || 0
+  const totalAvailable = tokenLimit + extraTokens
+
+  if (totalAvailable === 0 || tokenUsage.usedTokens + estimatedPromptTokens > totalAvailable) {
+    return NextResponse.json(
+      {
+        error: 'Limite de tokens atingido para o período atual.',
+        tokensUsed: tokenUsage.usedTokens,
+        tokenLimit,
+        extraTokens,
+        totalAvailable,
+        resetAt: periodEnd.toISOString()
+      },
+      { status: 403 }
+    )
+  }
+
   // Salvar mensagem do usuário
-  const fileNamesText = files.length > 0 
+  const fileNamesText = files.length > 0
     ? files.map(f => f.name).join(', ')
     : ''
   await prisma.message.create({
@@ -1073,6 +1132,31 @@ async function handleGemini(
     const result = await chat.sendMessage(parts)
     const response = await result.response
     const responseText = response.text()
+    const responseTokens = estimateTokensFromText(responseText)
+    const totalTokens = estimatedPromptTokens + responseTokens
+
+    const usedBefore = tokenUsage.usedTokens
+    const usedAfter = usedBefore + totalTokens
+    const overflowBefore = Math.max(0, usedBefore - tokenLimit)
+    const overflowAfter = Math.max(0, usedAfter - tokenLimit)
+    const extraToDeduct = Math.max(0, overflowAfter - overflowBefore)
+    const safeExtraToDeduct = Math.min(extraToDeduct, extraTokens)
+
+    const [updatedUsage, updatedUser] = await prisma.$transaction([
+      prisma.tokenUsage.update({
+        where: { id: tokenUsage.id },
+        data: {
+          usedTokens: { increment: totalTokens }
+        }
+      }),
+      prisma.user.update({
+        where: { id: userId },
+        data: {
+          extraTokens: { decrement: safeExtraToDeduct }
+        },
+        select: { extraTokens: true }
+      })
+    ])
 
     // Salvar resposta do assistente
     await prisma.message.create({
@@ -1104,6 +1188,11 @@ async function handleGemini(
     return NextResponse.json({
       response: responseText,
       conversation: updatedConversation,
+      tokensUsed: updatedUsage.usedTokens,
+      tokenLimit,
+      extraTokens: updatedUser.extraTokens,
+      totalAvailable: tokenLimit + updatedUser.extraTokens,
+      resetAt: periodEnd.toISOString()
     })
   } catch (geminiError: any) {
     console.error('❌ Erro ao chamar Gemini:', {

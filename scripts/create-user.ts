@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { isAdminEmail } from '../lib/admin'
 
 const prisma = new PrismaClient()
 
@@ -27,6 +28,7 @@ async function main() {
       name,
       email,
       password: hashedPassword,
+      role: isAdminEmail(email) ? 'admin' : 'user',
     },
   })
 
