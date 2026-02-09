@@ -983,7 +983,6 @@ async function handleGemini(
 
   const estimatedPromptTokens =
     estimateTokensFromText(message) +
-    estimateTokensFromText(config.systemInstruction) +
     historyTokens +
     estimateTokensFromFiles(files)
 
