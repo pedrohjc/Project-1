@@ -1883,7 +1883,7 @@ export default function DashboardPage() {
           {/* Área principal com sidebar */}
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden', background: 'var(--balance-bg)' }}>
             {/* Conteúdo principal */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--balance-bg)' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--balance-bg)', paddingBottom: '120px' }}>
               {/* Mensagens */}
               <div style={{ flex: 1, overflowY: 'auto', padding: '24px', background: 'var(--balance-bg)' }}>
                 <div style={{ maxWidth: '900px', margin: '0 auto' }}>
@@ -2136,7 +2136,12 @@ export default function DashboardPage() {
               borderTop: '1px solid var(--balance-border)',
               padding: '16px 24px',
               background: 'white',
-              flexShrink: 0
+              flexShrink: 0,
+              position: 'fixed',
+              bottom: 0,
+              left: '280px',
+              right: 0,
+              zIndex: 50
             }}>
               <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                 {/* Lista de arquivos selecionados */}

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Script from "next/script";
 import { Sora } from 'next/font/google'
 import './globals.css'
-import Footer from '../components/Footer'
+import FooterWrapper from '../components/FooterWrapper'
 
 const sora = Sora({ 
   subsets: ['latin'],
@@ -35,7 +35,7 @@ export default function RootLayout({
       <body className={sora.variable} style={{ fontFamily: 'var(--font-sora)' }}>
         <div className="page-shell">
           {children}
-          <Footer />
+          <FooterWrapper />
         </div>
       </body>
     </html>
