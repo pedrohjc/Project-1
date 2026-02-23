@@ -98,6 +98,20 @@ export default function LoginPage() {
             />
           </div>
 
+          <div style={{ textAlign: 'right', marginBottom: '12px', marginTop: '-8px' }}>
+            <Link
+              href="/forgot-password"
+              style={{
+                color: 'var(--balance-primary)',
+                fontSize: '0.85rem',
+                textDecoration: 'none',
+                fontWeight: '500',
+              }}
+            >
+              Esqueceu sua senha?
+            </Link>
+          </div>
+
           {error && (
             <div style={{ 
               padding: '12px', 

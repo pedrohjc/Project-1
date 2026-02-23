@@ -4,16 +4,16 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '../../components/Logo'
-import SocialLogin from '../../components/SocialLogin'
 
-export default function RegisterPage() {
+export default function ForgotPasswordPage() {
   const router = useRouter()
-  const [step, setStep] = useState<'form' | 'code'>('form')
-  const [name, setName] = useState('')
+  const [step, setStep] = useState<'email' | 'code' | 'newPassword'>('email')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [code, setCode] = useState(['', '', '', '', '', ''])
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [resendTimer, setResendTimer] = useState(0)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -34,19 +34,13 @@ export default function RegisterPage() {
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-
-    if (password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres')
-      return
-    }
-
     setLoading(true)
 
     try {
       const response = await fetch('/api/auth/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, type: 'register' }),
+        body: JSON.stringify({ email, type: 'reset' }),
       })
 
       const data = await response.json()
@@ -93,7 +87,7 @@ export default function RegisterPage() {
     }
   }
 
-  const handleVerifyAndRegister = async () => {
+  const handleVerifyCode = async () => {
     setError('')
     const codeStr = code.join('')
 
@@ -105,35 +99,61 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      const verifyRes = await fetch('/api/auth/verify-code', {
+      const response = await fetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: codeStr, type: 'register' }),
+        body: JSON.stringify({ email, code: codeStr, type: 'reset' }),
       })
 
-      const verifyData = await verifyRes.json()
+      const data = await response.json()
 
-      if (!verifyRes.ok) {
-        setError(verifyData.error || 'Código inválido')
+      if (!response.ok) {
+        setError(data.error || 'Código inválido')
         setLoading(false)
         return
       }
 
-      const registerRes = await fetch('/api/auth/register', {
+      setStep('newPassword')
+      setLoading(false)
+    } catch {
+      setError('Erro ao conectar com o servidor')
+      setLoading(false)
+    }
+  }
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+
+    if (newPassword.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres')
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError('As senhas não coincidem')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, code: codeStr }),
+        body: JSON.stringify({ email, code: code.join(''), newPassword }),
       })
 
-      const registerData = await registerRes.json()
+      const data = await response.json()
 
-      if (!registerRes.ok) {
-        setError(registerData.error || 'Erro ao criar conta')
+      if (!response.ok) {
+        setError(data.error || 'Erro ao redefinir senha')
         setLoading(false)
         return
       }
 
-      router.push('/dashboard')
+      setSuccess('Senha redefinida com sucesso! Redirecionando...')
+      setTimeout(() => router.push('/login'), 2000)
     } catch {
       setError('Erro ao conectar com o servidor')
       setLoading(false)
@@ -149,7 +169,7 @@ export default function RegisterPage() {
       const response = await fetch('/api/auth/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, type: 'register' }),
+        body: JSON.stringify({ email, type: 'reset' }),
       })
 
       const data = await response.json()
@@ -167,6 +187,18 @@ export default function RegisterPage() {
       setError('Erro ao conectar com o servidor')
       setLoading(false)
     }
+  }
+
+  const stepTitles = {
+    email: 'Recuperar Senha',
+    code: 'Verificar Código',
+    newPassword: 'Nova Senha',
+  }
+
+  const stepDescriptions = {
+    email: 'Digite seu email para receber um código de recuperação',
+    code: `Enviamos um código de 6 dígitos para ${email}`,
+    newPassword: 'Defina sua nova senha',
   }
 
   return (
@@ -193,79 +225,86 @@ export default function RegisterPage() {
             fontWeight: '700',
             fontFamily: 'var(--font-brand)',
           }}>
-            {step === 'form' ? 'Criar Conta' : 'Verificar Email'}
+            {stepTitles[step]}
           </h2>
           <p style={{ fontSize: '0.9rem', color: 'var(--balance-text-light)' }}>
-            {step === 'form' 
-              ? 'Comece a usar a Balance agora' 
-              : `Enviamos um código de 6 dígitos para ${email}`}
+            {stepDescriptions[step]}
           </p>
         </div>
 
-        {step === 'form' && (
-          <>
-            <SocialLogin mode="register" />
-            
-            <form onSubmit={handleSendCode}>
-              <div className="form-group">
-                <label htmlFor="name">Nome</label>
-                <input
-                  type="text"
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  placeholder="Seu nome"
-                />
+        {/* Step indicators */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: '8px', 
+          marginBottom: '24px' 
+        }}>
+          {['email', 'code', 'newPassword'].map((s, i) => (
+            <div
+              key={s}
+              style={{
+                width: '32px',
+                height: '4px',
+                borderRadius: '2px',
+                background: i <= ['email', 'code', 'newPassword'].indexOf(step) 
+                  ? 'var(--balance-primary)' 
+                  : 'var(--balance-border)',
+                transition: 'background 0.3s',
+              }}
+            />
+          ))}
+        </div>
+
+        {success && (
+          <div style={{ 
+            padding: '12px', 
+            background: '#e8f5e9', 
+            color: '#2e7d32', 
+            borderRadius: '8px', 
+            marginBottom: '20px',
+            fontSize: '0.9rem',
+            textAlign: 'center',
+          }}>
+            {success}
+          </div>
+        )}
+
+        {step === 'email' && (
+          <form onSubmit={handleSendCode}>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="seu@email.com"
+              />
+            </div>
+
+            {error && (
+              <div style={{ 
+                padding: '12px', 
+                background: '#fee', 
+                color: '#c33', 
+                borderRadius: '8px', 
+                marginBottom: '20px',
+                fontSize: '0.9rem'
+              }}>
+                {error}
               </div>
+            )}
 
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="seu@email.com"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password">Senha</label>
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Mínimo 6 caracteres"
-                />
-              </div>
-
-              {error && (
-                <div style={{ 
-                  padding: '12px', 
-                  background: '#fee', 
-                  color: '#c33', 
-                  borderRadius: '8px', 
-                  marginBottom: '20px',
-                  fontSize: '0.9rem'
-                }}>
-                  {error}
-                </div>
-              )}
-
-              <button 
-                type="submit" 
-                className="btn btn-primary" 
-                style={{ width: '100%', fontWeight: '600' }} 
-                disabled={loading}
-              >
-                {loading ? 'Enviando código...' : 'Enviar código de verificação'}
-              </button>
-            </form>
-          </>
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              style={{ width: '100%', fontWeight: '600' }} 
+              disabled={loading}
+            >
+              {loading ? 'Enviando...' : 'Enviar código'}
+            </button>
+          </form>
         )}
 
         {step === 'code' && (
@@ -323,9 +362,9 @@ export default function RegisterPage() {
               className="btn btn-primary" 
               style={{ width: '100%', fontWeight: '600', marginBottom: '12px' }} 
               disabled={loading || code.join('').length !== 6}
-              onClick={handleVerifyAndRegister}
+              onClick={handleVerifyCode}
             >
-              {loading ? 'Verificando...' : 'Verificar e criar conta'}
+              {loading ? 'Verificando...' : 'Verificar código'}
             </button>
 
             <div style={{ textAlign: 'center' }}>
@@ -349,7 +388,7 @@ export default function RegisterPage() {
 
             <div style={{ textAlign: 'center', marginTop: '12px' }}>
               <button
-                onClick={() => { setStep('form'); setError(''); setCode(['', '', '', '', '', '']) }}
+                onClick={() => { setStep('email'); setError(''); setCode(['', '', '', '', '', '']) }}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -358,10 +397,60 @@ export default function RegisterPage() {
                   fontSize: '0.85rem',
                 }}
               >
-                ← Voltar para o formulário
+                ← Voltar
               </button>
             </div>
           </div>
+        )}
+
+        {step === 'newPassword' && (
+          <form onSubmit={handleResetPassword}>
+            <div className="form-group">
+              <label htmlFor="newPassword">Nova senha</label>
+              <input
+                type="password"
+                id="newPassword"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                placeholder="Mínimo 6 caracteres"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="confirmPassword">Confirmar senha</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                placeholder="Repita a nova senha"
+              />
+            </div>
+
+            {error && (
+              <div style={{ 
+                padding: '12px', 
+                background: '#fee', 
+                color: '#c33', 
+                borderRadius: '8px', 
+                marginBottom: '20px',
+                fontSize: '0.9rem'
+              }}>
+                {error}
+              </div>
+            )}
+
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              style={{ width: '100%', fontWeight: '600' }} 
+              disabled={loading}
+            >
+              {loading ? 'Redefinindo...' : 'Redefinir senha'}
+            </button>
+          </form>
         )}
 
         <p style={{ 
@@ -369,7 +458,7 @@ export default function RegisterPage() {
           textAlign: 'center', 
           color: 'var(--balance-text-light)' 
         }}>
-          Já tem uma conta?{' '}
+          Lembrou sua senha?{' '}
           <Link 
             href="/login" 
             style={{ 

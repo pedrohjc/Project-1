@@ -5,16 +5,33 @@ import { isAdminEmail } from '@/lib/admin'
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json()
+    const { name, email, password, code } = await request.json()
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !code) {
       return NextResponse.json(
         { error: 'Todos os campos são obrigatórios' },
         { status: 400 }
       )
     }
 
-    // Verificar se o usuário já existe
+    const verificationCode = await prisma.verificationCode.findFirst({
+      where: {
+        email,
+        type: 'register',
+        used: false,
+        expiresAt: { gte: new Date() },
+        attempts: { lt: 5 },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    if (!verificationCode || verificationCode.code !== code) {
+      return NextResponse.json(
+        { error: 'Código de verificação inválido ou expirado' },
+        { status: 400 }
+      )
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { email },
     })
@@ -26,9 +43,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Criar usuário
     const hashedPassword = await hashPassword(password)
     const role = isAdminEmail(email) ? 'admin' : 'user'
+
     const user = await prisma.user.create({
       data: {
         name,
@@ -36,6 +53,11 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         role,
       },
+    })
+
+    await prisma.verificationCode.update({
+      where: { id: verificationCode.id },
+      data: { used: true },
     })
 
     // Gerar token
