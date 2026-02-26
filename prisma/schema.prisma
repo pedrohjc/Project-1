@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -38,6 +38,8 @@ model Conversation {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   threadId  String?   // ID do thread do OpenAI Assistant
+
+  @@index([userId, productId])
 }
 
 model Message {
@@ -47,6 +49,8 @@ model Message {
   conversationId String
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
 }
 
 model Subscription {
