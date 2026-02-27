@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getUserIdFromRequest } from '@/lib/middleware'
 import OpenAI from 'openai'
 
-// Inicializar cliente OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 export async function POST(request: NextRequest) {
   try {
     // Verificar autenticação
@@ -25,6 +20,8 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
     const { productId, message, conversation } = await request.json()
 
