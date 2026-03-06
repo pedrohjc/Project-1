@@ -49,6 +49,7 @@ const planNames: Record<string, string> = {
   monthly: 'Essentials',
   yearly: 'Operations',
   free: 'Free',
+  monthly_10k: 'Starter 10k',
 }
 
 export default function AdminUsersPage() {
@@ -59,6 +60,8 @@ export default function AdminUsersPage() {
   const [detailLoading, setDetailLoading] = useState(false)
   const [editRole, setEditRole] = useState('')
   const [editTokens, setEditTokens] = useState('')
+  const [trialPlan, setTrialPlan] = useState<'monthly_10k' | 'monthly' | 'yearly' | 'free'>('monthly_10k')
+  const [trialDays, setTrialDays] = useState('7')
 
   useEffect(() => {
     loadUsers()
@@ -88,11 +91,42 @@ export default function AdminUsersPage() {
         setSelectedUser(data.user)
         setEditRole(data.user.role)
         setEditTokens(String(data.user.extraTokens))
+      setTrialPlan((data.user.subscription?.plan as any) || 'monthly_10k')
+      setTrialDays('7')
       }
     } catch (err) {
       console.error(err)
     } finally {
       setDetailLoading(false)
+    }
+  }
+
+  const handleGrantTrial = async () => {
+    if (!selectedUser) return
+    const days = Number(trialDays)
+    if (!Number.isFinite(days) || days <= 0) {
+      alert('Dias inválidos')
+      return
+    }
+    try {
+      const res = await fetch(`/api/admin/users/${selectedUser.id}/grant-trial`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan: trialPlan,
+          days,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        alert(data.error || 'Erro ao conceder trial')
+        return
+      }
+      alert('Trial concedido')
+      loadUsers()
+      openDetail(selectedUser.id)
+    } catch {
+      alert('Erro ao conceder trial')
     }
   }
 
@@ -340,6 +374,78 @@ export default function AdminUsersPage() {
                     </p>
                   </div>
                 )}
+
+                {/* Grant trial */}
+                <div style={{ marginTop: '14px', padding: '14px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <p style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#8899a6', marginBottom: '10px' }}>
+                    Conceder trial
+                  </p>
+                  <div style={{ display: 'grid', gap: '10px' }}>
+                    <label style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#8899a6' }}>
+                      Plano
+                      <select
+                        value={trialPlan}
+                        onChange={(e) => setTrialPlan(e.target.value as any)}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          marginTop: '4px',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          background: '#0f1419',
+                          color: '#e7e9ea',
+                          fontSize: '0.9rem',
+                        }}
+                      >
+                        <option value="free">free</option>
+                        <option value="monthly_10k">monthly_10k</option>
+                        <option value="monthly">monthly</option>
+                        <option value="yearly">yearly</option>
+                      </select>
+                    </label>
+                    <label style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#8899a6' }}>
+                      Dias
+                      <input
+                        type="number"
+                        min={1}
+                        max={365}
+                        value={trialDays}
+                        onChange={(e) => setTrialDays(e.target.value)}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          marginTop: '4px',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          background: '#0f1419',
+                          color: '#e7e9ea',
+                          fontSize: '0.9rem',
+                        }}
+                      />
+                    </label>
+                    <button
+                      onClick={handleGrantTrial}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(120, 182, 213, 0.35)',
+                        background: 'rgba(120, 182, 213, 0.12)',
+                        color: '#78b6d5',
+                        fontWeight: '700',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Conceder trial
+                    </button>
+                    <p style={{ margin: 0, fontSize: '0.78rem', color: '#8899a6' }}>
+                      Isso ativa a assinatura e define expiração automática.
+                    </p>
+                  </div>
+                </div>
 
                 {/* Conversations */}
                 {selectedUser.conversations.length > 0 && (
