@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserIdFromRequest } from '@/lib/middleware'
 import { checkUserSubscription } from '@/lib/subscription'
-import { estimateTokensFromFiles, estimateTokensFromText, getTokenLimit, getTokenPeriod } from '@/lib/tokens'
+import { estimateTokensFromText, getTokenLimit, getTokenPeriod } from '@/lib/tokens'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
@@ -971,21 +971,6 @@ async function handleGemini(
     })
   }
 
-  // Calcular uso estimado de tokens antes de chamar o modelo
-  const recentMessages = conversation.messages
-    .filter((msg: any) => msg.role !== 'system')
-    .slice(-10)
-
-  const historyTokens = recentMessages.reduce(
-    (sum: number, msg: any) => sum + estimateTokensFromText(msg.content),
-    0
-  )
-
-  const estimatedPromptTokens =
-    estimateTokensFromText(message) +
-    historyTokens +
-    estimateTokensFromFiles(files)
-
   const { periodStart, periodEnd } = getTokenPeriod(new Date())
   const tokenLimit = getTokenLimit(plan)
 
@@ -1014,35 +999,10 @@ async function handleGemini(
   const extraTokens = user?.extraTokens || 0
   const totalAvailable = tokenLimit + extraTokens
 
-  if (totalAvailable === 0 || tokenUsage.usedTokens + estimatedPromptTokens > totalAvailable) {
-    return NextResponse.json(
-      {
-        error: 'Limite de tokens atingido para o período atual.',
-        tokensUsed: tokenUsage.usedTokens,
-        tokenLimit,
-        extraTokens,
-        totalAvailable,
-        resetAt: periodEnd.toISOString()
-      },
-      { status: 403 }
-    )
-  }
-
-  // Salvar mensagem do usuário
-  const fileNamesText = files.length > 0
-    ? files.map(f => f.name).join(', ')
-    : ''
-  await prisma.message.create({
-    data: {
-      role: 'user',
-      content: files.length > 0 ? `${message} [${files.length} arquivo(s): ${fileNamesText}]` : message,
-      conversationId: conversation.id,
-    },
-  })
-
   // Configurar o modelo Gemini
   // Tentar diferentes formatos de nome de modelo se necessário
   let model
+  let selectedModelName = ''
   const modelNamesToTry = [
     config.model, // Primeiro tenta o modelo configurado (gemini-1.5-flash-001)
     config.model.replace('-001', ''), // Remove sufixo -001 (gemini-1.5-flash)
@@ -1059,6 +1019,7 @@ async function handleGemini(
         model: modelName,
         systemInstruction: config.systemInstruction,
       })
+      selectedModelName = modelName
       console.log(`✅ Modelo ${modelName} configurado com sucesso!`)
       break
     } catch (modelError: any) {
@@ -1069,6 +1030,7 @@ async function handleGemini(
         model = genAI.getGenerativeModel({ 
           model: modelName,
         })
+        selectedModelName = modelName
         console.log(`✅ Modelo ${modelName} configurado (sem systemInstruction)!`)
         break
       } catch (error2: any) {
@@ -1125,13 +1087,65 @@ async function handleGemini(
       parts: [{ text: msg.content }],
     }))
 
+  let estimatedPromptTokens = 0
+  try {
+    const meteringModel = genAI.getGenerativeModel({ model: selectedModelName })
+    const tokenCount = await meteringModel.countTokens({
+      contents: [
+        ...history,
+        { role: 'user', parts },
+      ],
+    })
+    estimatedPromptTokens = tokenCount.totalTokens || 0
+  } catch (countError) {
+    console.warn('Falha ao contar tokens com Gemini, usando fallback textual.', countError)
+    estimatedPromptTokens =
+      estimateTokensFromText(message) +
+      history.reduce(
+        (sum: number, entry: any) =>
+          sum + entry.parts.reduce(
+            (partSum: number, part: any) =>
+              partSum + (typeof part?.text === 'string' ? estimateTokensFromText(part.text) : 0),
+            0
+          ),
+        0
+      )
+  }
+
+  if (totalAvailable === 0 || tokenUsage.usedTokens + estimatedPromptTokens > totalAvailable) {
+    return NextResponse.json(
+      {
+        error: 'Limite de tokens atingido para o período atual.',
+        tokensUsed: tokenUsage.usedTokens,
+        tokenLimit,
+        extraTokens,
+        totalAvailable,
+        resetAt: periodEnd.toISOString()
+      },
+      { status: 403 }
+    )
+  }
+
+  // Salvar mensagem do usuário
+  const fileNamesText = files.length > 0
+    ? files.map(f => f.name).join(', ')
+    : ''
+  await prisma.message.create({
+    data: {
+      role: 'user',
+      content: files.length > 0 ? `${message} [${files.length} arquivo(s): ${fileNamesText}]` : message,
+      conversationId: conversation.id,
+    },
+  })
+
   // Chamar Gemini API
   try {
     const chat = model.startChat({ history })
     const result = await chat.sendMessage(parts)
     const response = await result.response
     const responseText = response.text()
-    const responseTokens = estimateTokensFromText(responseText)
+    const responseTokens =
+      response.usageMetadata?.candidatesTokenCount ?? estimateTokensFromText(responseText)
     const totalTokens = estimatedPromptTokens + responseTokens
 
     const usedBefore = tokenUsage.usedTokens
