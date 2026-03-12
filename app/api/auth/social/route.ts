@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
           provider,
           providerId,
           avatarUrl,
-          password: '', // social users don't have a password
+          // passwordHash fica null para usuários OAuth
           role: 'user',
         },
       })

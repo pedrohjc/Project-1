@@ -13,7 +13,7 @@ datasource db {
 model User {
   id            String         @id @default(cuid())
   email         String         @unique
-  password      String         @default("")
+  passwordHash  String?        // hash bcrypt; null para OAuth
   name          String
   role          String         @default("user")
   provider      String?        // 'google', 'facebook', 'linkedin' ou null (e-mail)

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Logo from '../../../components/Logo'
 
 const included = [
+  '850k tokens por mês incluídos',
   'Tudo do plano Operations (15 Agents prontos)',
   'Até 3 Agents custom criados por você (com guia)',
   'Templates e modelos prontos para configuração',
@@ -48,10 +49,10 @@ export default function CustomPage() {
             Crie até 3 Agents personalizados
           </h1>
           <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--balance-text)', marginBottom: '4px' }}>
-            R$ 499,93<span style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--balance-text-light)' }}>/mês</span>
+            R$ 499,90<span style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--balance-text-light)' }}>/mês</span>
           </div>
           <p style={{ color: 'var(--balance-text-light)', maxWidth: '700px', margin: '0 auto', lineHeight: '1.7' }}>
-            Resolva gargalos específicos do seu negócio com Agents feitos sob medida. Guia, templates e suporte inclusos.
+            Resolva gargalos específicos do seu negócio com Agents feitos sob medida. Inclui 850k tokens por mês, guia, templates e suporte.
           </p>
         </div>
 

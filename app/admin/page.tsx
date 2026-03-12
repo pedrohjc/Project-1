@@ -40,6 +40,7 @@ interface Stats {
 const planNames: Record<string, string> = {
   monthly: 'Essentials',
   yearly: 'Operations',
+  custom: 'Custom Pro',
   free: 'Free',
 }
 

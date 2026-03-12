@@ -48,6 +48,7 @@ interface UserDetail {
 const planNames: Record<string, string> = {
   monthly: 'Essentials',
   yearly: 'Operations',
+  custom: 'Custom Pro',
   free: 'Free',
   monthly_10k: 'Starter 10k',
 }
@@ -60,7 +61,7 @@ export default function AdminUsersPage() {
   const [detailLoading, setDetailLoading] = useState(false)
   const [editRole, setEditRole] = useState('')
   const [editTokens, setEditTokens] = useState('')
-  const [trialPlan, setTrialPlan] = useState<'monthly_10k' | 'monthly' | 'yearly' | 'free'>('monthly_10k')
+  const [trialPlan, setTrialPlan] = useState<'monthly_10k' | 'monthly' | 'yearly' | 'custom' | 'free'>('monthly_10k')
   const [trialDays, setTrialDays] = useState('7')
 
   useEffect(() => {
@@ -402,6 +403,7 @@ export default function AdminUsersPage() {
                         <option value="monthly_10k">monthly_10k</option>
                         <option value="monthly">monthly</option>
                         <option value="yearly">yearly</option>
+                        <option value="custom">custom</option>
                       </select>
                     </label>
                     <label style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#8899a6' }}>

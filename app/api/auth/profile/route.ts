@@ -104,8 +104,14 @@ export async function PUT(request: NextRequest) {
         )
       }
 
-      // Verificar senha atual
-      const isValidPassword = await verifyPassword(currentPassword, user.password)
+      // Verificar senha atual (usuários OAuth não têm passwordHash)
+      if (!user.passwordHash) {
+        return NextResponse.json(
+          { error: 'Conta vinculada a rede social. Use a rede social para alterar a senha.' },
+          { status: 400 }
+        )
+      }
+      const isValidPassword = await verifyPassword(currentPassword, user.passwordHash)
 
       if (!isValidPassword) {
         return NextResponse.json(
@@ -122,7 +128,7 @@ export async function PUT(request: NextRequest) {
         )
       }
 
-      updateData.password = await hashPassword(newPassword.trim())
+      updateData.passwordHash = await hashPassword(newPassword.trim())
     }
 
     // Se não houver nada para atualizar

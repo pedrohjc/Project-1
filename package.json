@@ -10,6 +10,7 @@
     "create-user": "tsx scripts/create-user.ts"
   },
   "dependencies": {
+    "@google/genai": "^1.44.0",
     "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^5.7.1",
     "bcryptjs": "^2.4.3",

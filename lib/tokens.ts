@@ -1,10 +1,11 @@
-export type TokenPlan = 'free' | 'monthly_10k' | 'monthly' | 'yearly'
+export type TokenPlan = 'free' | 'monthly_10k' | 'monthly' | 'yearly' | 'custom'
 
 const TOKEN_LIMITS: Record<TokenPlan, number> = {
   free: 0,
   monthly_10k: 10000,
   monthly: 50000,
   yearly: 300000,
+  custom: 850000,
 }
 
 export function getTokenLimit(plan: string): number {

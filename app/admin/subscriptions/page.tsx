@@ -24,6 +24,7 @@ interface Sub {
 const planNames: Record<string, string> = {
   monthly: 'Essentials',
   yearly: 'Operations',
+  custom: 'Custom Pro',
   free: 'Free',
 }
 
@@ -131,6 +132,7 @@ export default function AdminSubscriptionsPage() {
           <option value="">Todos os planos</option>
           <option value="monthly">Essentials</option>
           <option value="yearly">Operations</option>
+          <option value="custom">Custom Pro</option>
           <option value="free">Free</option>
         </select>
       </div>

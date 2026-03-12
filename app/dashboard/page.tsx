@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm'
 import Link from 'next/link'
 import Image from 'next/image'
 import Logo from '../../components/Logo'
+import InstagramCreativeStudio from '../../components/InstagramCreativeStudio'
 
 interface User {
   id: string
@@ -39,6 +40,8 @@ interface Conversation {
   createdAt: string
   updatedAt: string
 }
+
+const INSTAGRAM_CREATIVE_PRODUCT_ID = 'instagram-creative-studio'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -90,7 +93,7 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
-    if (selectedProduct) {
+    if (selectedProduct && selectedProduct.id !== INSTAGRAM_CREATIVE_PRODUCT_ID) {
       loadConversations()
     } else {
       // Limpar conversas quando não há produto selecionado
@@ -307,11 +310,12 @@ export default function DashboardPage() {
     }
   }
 
-  const loadConversations = async () => {
-    if (!selectedProduct) return
+  const loadConversations = async (productIdOverride?: string) => {
+    const productId = productIdOverride || selectedProduct?.id
+    if (!productId || productId === INSTAGRAM_CREATIVE_PRODUCT_ID) return
     
     try {
-      const response = await fetch(`/api/conversations?productId=${selectedProduct.id}`)
+      const response = await fetch(`/api/conversations?productId=${productId}`)
       if (response.ok) {
         const data = await response.json()
         setConversations(data.conversations || [])
@@ -349,8 +353,9 @@ export default function DashboardPage() {
     setActiveConversationId(null)
     setInput('')
     setSelectedFiles([])
+    setConversations([])
     // Carregar conversas do produto selecionado
-    await loadConversations()
+    await loadConversations(product.id)
     // Atualizar lista de produtos recentes
     await loadRecentProducts()
   }
@@ -721,6 +726,30 @@ export default function DashboardPage() {
     </svg>
   )
 
+  const InstagramCreativeStudioIcon = () => (
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="16" fill="#2563EB"/>
+      <rect x="16" y="16" width="48" height="48" rx="12" fill="#EFF6FF"/>
+      <rect x="24" y="24" width="32" height="20" rx="6" fill="#2563EB" opacity="0.18"/>
+      <rect x="24" y="50" width="15" height="4" rx="2" fill="#2563EB" opacity="0.45"/>
+      <rect x="41" y="50" width="15" height="4" rx="2" fill="#2563EB" opacity="0.28"/>
+      <circle cx="32" cy="34" r="4" fill="#2563EB"/>
+      <path d="M40 38C42.2 34.8 45 31.9 50 30L56 44H24L31 35C33.5 36 35.4 37.2 37.2 39.2L40 38Z" fill="#2563EB"/>
+    </svg>
+  )
+
+  const InstagramCreativeStudioIconSmall = () => (
+    <svg width="48" height="48" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="16" fill="#2563EB"/>
+      <rect x="16" y="16" width="48" height="48" rx="12" fill="#EFF6FF"/>
+      <rect x="24" y="24" width="32" height="20" rx="6" fill="#2563EB" opacity="0.18"/>
+      <rect x="24" y="50" width="15" height="4" rx="2" fill="#2563EB" opacity="0.45"/>
+      <rect x="41" y="50" width="15" height="4" rx="2" fill="#2563EB" opacity="0.28"/>
+      <circle cx="32" cy="34" r="4" fill="#2563EB"/>
+      <path d="M40 38C42.2 34.8 45 31.9 50 30L56 44H24L31 35C33.5 36 35.4 37.2 37.2 39.2L40 38Z" fill="#2563EB"/>
+    </svg>
+  )
+
   const products: Product[] = [
     {
       id: 'tradutor-juridiques',
@@ -760,6 +789,14 @@ export default function DashboardPage() {
       subtitle: 'Crie propostas claras e atrativas',
       description: 'Estruture propostas de honorários éticas e atrativas. Destaque o valor do serviço, organize fases do processo e quebre objeções.',
       icon: <OrganizadorPropostasIcon />,
+      group: 'Redação'
+    },
+    {
+      id: INSTAGRAM_CREATIVE_PRODUCT_ID,
+      title: 'Balance Criador de Carrossel para Instagram',
+      subtitle: 'Pesquisa, copy e criativo final em um fluxo guiado',
+      description: 'Descubra ideias fortes, gere a copy do carrossel e renderize os slides finais em um MVP local pronto para validar o produto.',
+      icon: <InstagramCreativeStudioIcon />,
       group: 'Redação'
     }
   ]
@@ -837,6 +874,8 @@ export default function DashboardPage() {
         return <QuebraObjecoesIconSmall />
       case 'organizador-propostas':
         return <OrganizadorPropostasIconSmall />
+      case INSTAGRAM_CREATIVE_PRODUCT_ID:
+        return <InstagramCreativeStudioIconSmall />
       default:
         return <TradutorJuridiquesIconSmall />
     }
@@ -855,6 +894,8 @@ export default function DashboardPage() {
         return 'Balance Quebra de Objeções'
       case 'organizador-propostas':
         return 'Balance Organizador de Propostas'
+      case INSTAGRAM_CREATIVE_PRODUCT_ID:
+        return 'Balance Criador de Carrossel'
       default:
         return 'Balance Assistant'
     }
@@ -1800,6 +1841,13 @@ export default function DashboardPage() {
                 </svg>
               </div>
             </div>
+          </div>
+        </div>
+      ) : selectedProduct.id === INSTAGRAM_CREATIVE_PRODUCT_ID ? (
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          {renderRecentProductsSidebar()}
+          <div style={{ flex: 1, overflow: 'auto', marginLeft: '280px', background: 'var(--balance-bg)' }}>
+            <InstagramCreativeStudio />
           </div>
         </div>
       ) : (

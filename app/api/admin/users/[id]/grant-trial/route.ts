@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserIdFromRequest } from '@/lib/middleware'
 
-type TrialPlan = 'free' | 'monthly_10k' | 'monthly' | 'yearly'
-const ALLOWED_PLANS: TrialPlan[] = ['free', 'monthly_10k', 'monthly', 'yearly']
+type TrialPlan = 'free' | 'monthly_10k' | 'monthly' | 'yearly' | 'custom'
+const ALLOWED_PLANS: TrialPlan[] = ['free', 'monthly_10k', 'monthly', 'yearly', 'custom']
 
 export async function POST(
   request: NextRequest,

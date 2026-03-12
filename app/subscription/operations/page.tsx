@@ -37,6 +37,7 @@ const sectors = [
 ]
 
 const included = [
+  '300k tokens por mês incluídos',
   'Tudo do plano Essentials (5 Agents jurídicos)',
   '10 Agents setoriais prontos',
   'Logs + revisão mensal pela Balance',
@@ -72,10 +73,10 @@ export default function OperationsPage() {
             10 Agents setoriais prontos
           </h1>
           <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--balance-text)', marginBottom: '4px' }}>
-            R$ 169,86<span style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--balance-text-light)' }}>/mês</span>
+            R$ 169,90<span style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--balance-text-light)' }}>/mês</span>
           </div>
           <p style={{ color: 'var(--balance-text-light)', maxWidth: '700px', margin: '0 auto', lineHeight: '1.7' }}>
-            Financeiro, Marketing, Produção e Atendimento automatizados. Inclui revisão mensal e 1 call de acompanhamento.
+            Financeiro, Marketing, Produção e Atendimento automatizados. Inclui 300k tokens por mês, revisão mensal e 1 call de acompanhamento.
           </p>
         </div>
 

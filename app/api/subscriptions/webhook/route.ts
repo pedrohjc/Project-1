@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       if (paymentStatus === 'approved') {
         // Calcular data de término baseado no plano
         const endDate = new Date()
-        if (subscription.plan === 'monthly') {
+        if (subscription.plan === 'monthly' || subscription.plan === 'custom') {
           endDate.setMonth(endDate.getMonth() + 1)
         } else if (subscription.plan === 'yearly') {
           endDate.setFullYear(endDate.getFullYear() + 1)

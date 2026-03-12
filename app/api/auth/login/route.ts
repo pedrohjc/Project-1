@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar senha
-    const isValid = await verifyPassword(password, user.password)
+    const isValid = user.passwordHash && await verifyPassword(password, user.passwordHash)
 
     if (!isValid) {
       return NextResponse.json(

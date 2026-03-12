@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       }),
       prisma.user.update({
         where: { email },
-        data: { password: hashedPassword },
+        data: { passwordHash: hashedPassword },
       }),
     ])
 

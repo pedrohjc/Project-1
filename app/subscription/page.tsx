@@ -28,6 +28,7 @@ const plans = [
     badge: null,
     description: '5 Agents prontos para o jurídico',
     features: [
+      '50k tokens/mês incluídos',
       'Tradutor Juridiquês',
       'Checklist Tributário',
       'Conteúdo Jurídico Ético',
@@ -41,12 +42,13 @@ const plans = [
   {
     id: 'operations',
     name: 'Operations',
-    price: 'R$ 169,86',
+    price: 'R$ 169,90',
     period: 'por mês',
     highlight: true,
     badge: 'Mais popular',
     description: '10 Agents setoriais prontos',
     features: [
+      '300k tokens/mês incluídos',
       'Tudo do Essentials',
       'Conciliação de recibos',
       'Cobrança inteligente',
@@ -66,7 +68,7 @@ const plans = [
   {
     id: 'custom',
     name: 'Custom Pro',
-    price: 'R$ 499,93',
+    price: 'R$ 499,90',
     period: 'por mês',
     highlight: false,
     badge: null,
@@ -78,8 +80,9 @@ const plans = [
       'Validação manual opcional',
       'Logs + versionamento de regras',
       'Chat + 1 call de configuração',
+      '850k tokens/mês incluídos',
     ],
-    apiPlan: 'monthly' as const,
+    apiPlan: 'custom' as const,
   },
   {
     id: 'unlimited',
@@ -99,7 +102,8 @@ const plans = [
       'Suporte prioritário dedicado',
       'Calls semanais de acompanhamento',
     ],
-    apiPlan: 'yearly' as const,
+    ctaHref: '/subscription/unlimited',
+    ctaLabel: 'Ver detalhes',
   },
 ]
 
@@ -126,7 +130,7 @@ export default function SubscriptionPage() {
     }
   }
 
-  const handleSubscribe = async (plan: 'monthly' | 'yearly') => {
+  const handleSubscribe = async (plan: 'monthly' | 'yearly' | 'custom') => {
     setProcessing(plan)
     try {
       const response = await fetch('/api/subscriptions/create-preference', {
@@ -276,7 +280,7 @@ export default function SubscriptionPage() {
               Assinatura Ativa
             </h3>
             <p style={{ color: 'var(--balance-text-light)', marginBottom: '1rem' }}>
-              Plano: <strong>{currentPlan === 'monthly' ? 'Essentials' : currentPlan === 'yearly' ? 'Operations' : currentPlan}</strong>
+              Plano: <strong>{currentPlan === 'monthly' ? 'Essentials' : currentPlan === 'yearly' ? 'Operations' : currentPlan === 'custom' ? 'Custom Pro' : currentPlan}</strong>
             </p>
             {subscription?.subscription?.endDate && (
               <p style={{ color: 'var(--balance-text-light)', fontSize: '0.9rem', marginBottom: '1rem' }}>
@@ -403,14 +407,24 @@ export default function SubscriptionPage() {
                 ))}
               </ul>
 
-              <button
-                onClick={() => handleSubscribe(plan.apiPlan)}
-                className={plan.highlight ? 'btn btn-primary' : 'btn btn-secondary'}
-                style={{ width: '100%' }}
-                disabled={processing === plan.apiPlan}
-              >
-                {processing === plan.apiPlan ? 'Processando...' : 'Assinar'}
-              </button>
+              {'apiPlan' in plan ? (
+                <button
+                  onClick={() => handleSubscribe(plan.apiPlan!)}
+                  className={plan.highlight ? 'btn btn-primary' : 'btn btn-secondary'}
+                  style={{ width: '100%' }}
+                  disabled={processing === plan.apiPlan}
+                >
+                  {processing === plan.apiPlan ? 'Processando...' : 'Assinar'}
+                </button>
+              ) : (
+                <Link
+                  href={plan.ctaHref}
+                  className={plan.highlight ? 'btn btn-primary' : 'btn btn-secondary'}
+                  style={{ width: '100%', display: 'block', textAlign: 'center' }}
+                >
+                  {plan.ctaLabel}
+                </Link>
+              )}
 
               <Link
                 href={`/subscription/${plan.id}`}

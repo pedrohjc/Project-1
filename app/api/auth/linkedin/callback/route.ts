@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
           provider: 'linkedin',
           providerId: userData.sub,
           avatarUrl: userData.picture,
-          password: '',
+          // OAuth users do not have a passwordHash
           role: 'user',
         },
       })

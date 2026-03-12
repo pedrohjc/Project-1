@@ -27,6 +27,7 @@ const agents = [
 ]
 
 const included = [
+  '50k tokens por mês incluídos',
   '5 Agents jurídicos prontos para uso',
   'Logs básicos de ações executadas',
   'Suporte assíncrono (e-mail / plataforma)',
@@ -68,7 +69,7 @@ export default function EssentialsPage() {
             R$ 29,90<span style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--balance-text-light)' }}>/mês</span>
           </div>
           <p style={{ color: 'var(--balance-text-light)', maxWidth: '600px', margin: '0 auto', lineHeight: '1.7' }}>
-            Comece a automatizar tarefas operacionais do escritório com 5 Agents prontos, logs de ações e suporte assíncrono.
+            Comece a automatizar tarefas operacionais do escritório com 5 Agents prontos, 50k tokens por mês, logs de ações e suporte assíncrono.
           </p>
         </div>
 

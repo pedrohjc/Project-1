@@ -26,9 +26,9 @@ export async function POST(request: NextRequest) {
 
     const { plan } = await request.json()
 
-    if (!plan || !['monthly', 'yearly'].includes(plan)) {
+    if (!plan || !['monthly', 'yearly', 'custom'].includes(plan)) {
       return NextResponse.json(
-        { error: 'Plano inválido. Use "monthly" ou "yearly"' },
+        { error: 'Plano inválido. Use "monthly", "yearly" ou "custom"' },
         { status: 400 }
       )
     }
@@ -36,12 +36,14 @@ export async function POST(request: NextRequest) {
     // Valores dos planos (em reais)
     const planPrices: Record<string, number> = {
       monthly: 29.90,
-      yearly: 299.90
+      yearly: 169.90,
+      custom: 499.90,
     }
 
     const planNames: Record<string, string> = {
-      monthly: 'Mensal',
-      yearly: 'Anual'
+      monthly: 'Essentials',
+      yearly: 'Operations',
+      custom: 'Custom Pro',
     }
 
     const price = planPrices[plan]
